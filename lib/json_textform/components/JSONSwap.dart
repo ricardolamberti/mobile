@@ -1,4 +1,4 @@
-// @dart=2.9
+
 import 'package:astor_mobile/astorScreen.dart';
 import 'package:astor_mobile/json_textform/components/JSONDropDownButton.dart';
 import 'package:astor_mobile/json_textform/utils-components/OutlineButtonContainer.dart';

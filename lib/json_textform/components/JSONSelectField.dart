@@ -1,4 +1,4 @@
-// @dart=2.9
+
 
 import 'package:astor_mobile/json_textform/components/pages/NewPage.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';

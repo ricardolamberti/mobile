@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';

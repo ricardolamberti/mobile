@@ -1,4 +1,4 @@
-// @dart=2.9
+
 import 'package:astor_mobile/json_textform/models/Controller.dart';
 import 'package:astor_mobile/json_textform/models/components/Action.dart';
 import 'package:astor_mobile/json_textform/models/components/AvaliableWidgetTypes.dart';
