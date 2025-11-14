@@ -18,10 +18,11 @@ class JSONCard extends StatefulWidget {
   final AstorComponente schema;
   final OnBuildBody onBuildBody;
 
-  JSONCard({
-    @required this.schema,
-    @required this.onBuildBody,
-  });
+  const JSONCard({
+    Key? key,
+    required this.schema,
+    required this.onBuildBody,
+  }) : super(key: key);
 
   @override
   _JSONCardState createState() => _JSONCardState();
@@ -32,7 +33,7 @@ class _JSONCardState extends State<JSONCard> {
   final _formKey = GlobalKey<FormState>();
 
   _JSONCardState();
-  Future<AstorApp>  futureComponente=null;
+  Future<AstorApp>? futureComponente;
 
 
   @override
@@ -44,10 +45,10 @@ class _JSONCardState extends State<JSONCard> {
   @override
   Widget build(BuildContext context) {
     if (widget.schema.diferido && widget.schema.components.isEmpty) {
-      futureComponente=onDiferidoForm(widget.schema, context);
+      futureComponente = onDiferidoForm(widget.schema, context);
     }
 
-    if (futureComponente==null)
+    if (futureComponente == null)
       return JSONDiv(
         schema: widget.schema,
         useBootstrap: true,
@@ -73,11 +74,12 @@ class _JSONCardState extends State<JSONCard> {
 
   }
 
-
-  Future<AstorApp> onDiferidoForm(AstorComponente schema, [BuildContext context]) async {
-
-      AstorProvider astorProvider = Provider.of(context, listen: false);
-      return astorProvider.doDiferido(schema, context, schema.actionTarget);
+  Future<AstorApp> onDiferidoForm(AstorComponente schema, [BuildContext? context]) async {
+    if (context == null) {
+      throw ArgumentError('context is required');
+    }
+    AstorProvider astorProvider = Provider.of(context, listen: false);
+    return astorProvider.doDiferido(schema, context, schema.actionTarget);
   }
 }
 
