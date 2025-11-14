@@ -17,22 +17,22 @@ import 'json_textform/components/LoadingDialog.dart';
 import 'json_textform/utils-components/pushNotification.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await dotenv.load(fileName: "assets/config.env");
   await getDeviceIdentifier();
 
-  runApp(MyApp());
-
-
+  runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   ThemeData buildTheme() {
     final ThemeData base = ThemeData();
     return base.copyWith(
-      iconTheme: IconThemeData(color: Colors.black45),
-      inputDecorationTheme: InputDecorationTheme(
+      iconTheme: const IconThemeData(color: Colors.black45),
+      inputDecorationTheme: const InputDecorationTheme(
         fillColor: Colors.black45,
       ),
     );
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: buildTheme(),
         title: 'Astor',
-        home: AstorPage(),
+        home: const AstorPage(),
       ),
     );
   }
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
 
 
 class AstorPage extends StatefulWidget {
-
+  const AstorPage({Key? key}) : super(key: key);
 
   @override
   _AstorStatePage createState() => _AstorStatePage();
@@ -76,24 +76,34 @@ class _AstorStatePage extends State<AstorPage> {
 
   @override
   Widget build(BuildContext context) {
-    AstorProvider astorProvider = Provider.of(context);
-    if (astorProvider.astorApp==null || astorProvider.redraw) {
+    final AstorProvider astorProvider = Provider.of<AstorProvider>(context);
+    if (astorProvider.astorApp == null || astorProvider.redraw) {
       astorProvider.redraw = false;
-      return FutureBuilder<AstorApp>(
-          future: astorProvider.futureAstorApp,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              astorProvider.astorApp = snapshot.data;
-              astorProvider.checkUserLogin();
-              return AstorScreen(astorApp: astorProvider.astorApp);
-            } else if (snapshot.hasError) {
-              return getMaterialError("${snapshot.error}");
-            }
+      return FutureBuilder<AstorApp?>(
+        future: astorProvider.futureAstorApp,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return LoadingDialog();
-          });
+          }
+          if (snapshot.hasError) {
+            return getMaterialError("${snapshot.error}");
+          }
+          final AstorApp? astorApp = snapshot.data;
+          if (astorApp == null) {
+            return getMaterialError("No se pudo obtener la configuración inicial");
+          }
+          astorProvider.astorApp = astorApp;
+          astorProvider.checkUserLogin();
+          return AstorScreen(astorApp: astorApp);
+        },
+      );
+    } else {
+      final AstorApp? astorApp = astorProvider.astorApp;
+      if (astorApp == null) {
+        return getMaterialError("No se pudo obtener la configuración inicial");
+      }
+      return AstorScreen(astorApp: astorApp);
     }
-    else
-      return AstorScreen(astorApp: astorProvider.astorApp);
   }
 
 
@@ -115,8 +125,10 @@ class _AstorStatePage extends State<AstorPage> {
                 Text(stringError),
                 Divider(),
                 TextButton(
-                  onPressed: () => Provider.of<AstorProvider>(context,listen: false).reload(),
-                  child: Text('Reintentar'))
+                    onPressed: () =>
+                        Provider.of<AstorProvider>(context, listen: false)
+                            .reload(),
+                    child: Text('Reintentar'))
               ],
             )
         ),
