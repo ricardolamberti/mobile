@@ -1,54 +1,34 @@
 
-import 'dart:io';
-
 // import 'package:file_picker/file_picker.dart';
-import 'package:astor_mobile/json_textform/components/JSONActionBar.dart';
-import 'package:astor_mobile/json_textform/components/JSONActionBarSideBar.dart';
-import 'package:astor_mobile/json_textform/components/JSONButton.dart';
-import 'package:astor_mobile/json_textform/components/JSONFieldset.dart';
 import 'package:astor_mobile/json_textform/models/Controller.dart';
-import 'package:astor_mobile/json_textform/models/components/Action.dart';
 import 'package:astor_mobile/json_textform/models/components/AvaliableWidgetTypes.dart';
-import 'package:astor_mobile/json_textform/models/components/Icon.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import '../models/components/FileFieldValue.dart';
-import '../utils-components/OutlineButtonContainer.dart';
 
 import '../JSONForm.dart';
-import '../utils.dart';
-import '/json_textform/components/JSONCheckboxField.dart';
-import '/json_textform/components/JSONDateTimeField.dart';
-import '/json_textform/components/JSONFileField.dart';
-import '/json_textform/components/JSONSelectField.dart';
-import '/json_textform/components/JSONTextFormField.dart';
-import 'JSONDropDownButton.dart';
-import 'JSONIcon.dart';
-import 'JSONInfoCard.dart';
-import 'JSONLabel.dart';
-import 'JSONWinList.dart';
-import 'JSONNavigationBar.dart';
 
-typedef void OnChange(FileFieldValue value);
+typedef OnChange = void Function(FileFieldValue value);
 
 class JSONDiv extends StatelessWidget {
   final AstorComponente schema;
 
-  final Widget loadingDialog;
-  final OnFileUpload onFileUpload;
-  final OnSearch onSearch;
-  final JSONSchemaController controller;
-  final String schemaName;
-  final Map<String, dynamic> values;
-  final OnSubmit onSubmit;
+  final Widget? loadingDialog;
+  final OnFileUpload? onFileUpload;
+  final OnSearch? onSearch;
+  final JSONSchemaController? controller;
+  final String? schemaName;
+  final Map<String, dynamic>? values;
+  final OnSubmit? onSubmit;
   final OnBuildBody onBuildBody;
-  bool useBootstrap = true;
-  bool actionBar = true;
+  final bool useBootstrap;
+  final bool actionBar;
 
-  JSONDiv({
-    @required this.schema,
-    @required this.onBuildBody,
+  const JSONDiv({
+    Key? key,
+    required this.schema,
+    required this.onBuildBody,
     this.values,
     this.schemaName,
     this.controller,
@@ -58,12 +38,12 @@ class JSONDiv extends StatelessWidget {
     this.onFileUpload,
     this.useBootstrap = true,
     this.actionBar = false,
-  });
+  }) : super(key: key);
 
-  BoxDecoration getResponsiveBoxDecoration() {
+  BoxDecoration? getResponsiveBoxDecoration() {
     String pos = "";
-    Color border = null;
-    Color fill = null;
+    Color? border;
+    Color? fill;
     pos = schema.classResponsive;
     if (pos == "") return null;
     List<String> commands = pos.split(" ");
@@ -86,20 +66,18 @@ class JSONDiv extends StatelessWidget {
         border = Colors.green;
       else if (command.indexOf("-info") != -1) border = Colors.lightBlueAccent;
     }
-    if (border != null && fill != null)
-      return BoxDecoration(
-          color: fill,
-          border: Border.all(color: border)
-      );
-    if (border != null)
-      return BoxDecoration(
-          border: Border.all(color: border)
-      );
-    if (fill != null)
+    if (border != null && fill != null) {
+      return BoxDecoration(color: fill, border: Border.all(color: border));
+    }
+    if (border != null) {
+      return BoxDecoration(border: Border.all(color: border));
+    }
+    if (fill != null) {
       return BoxDecoration(
         color: fill,
       );
-    return BoxDecoration(color: Colors.white);
+    }
+    return const BoxDecoration(color: Colors.white);
   }
 
   String getResponsiveSize(AstorComponente comp) {
@@ -181,7 +159,7 @@ class JSONDiv extends StatelessWidget {
     return false;
   }
 
-  Color getColorBorder(AstorComponente comp) {
+  Color? getColorBorder(AstorComponente comp) {
     if ((comp.classResponsive.indexOf("btn") == -1)&&(comp.classResponsive.indexOf("border") == -1)) {
       return null;
     }
@@ -211,7 +189,7 @@ class JSONDiv extends StatelessWidget {
   }
 
   Widget addBorder(BuildContext context) {
-    Color color =getColorBorder(schema);
+    Color? color =getColorBorder(schema);
     if (color!=null) {
       return Container(
         decoration:  BoxDecoration(
@@ -236,19 +214,20 @@ class JSONDiv extends StatelessWidget {
         child: addDiv(context,true,WrapAlignment.start,MainAxisAlignment.start),
       );
     if (isFull(schema))
-      return Padding(padding: EdgeInsets.only(left: 20, right: 20,),
+      return Padding(padding: const EdgeInsets.only(left: 20, right: 20,),
           child: addDiv(context,false,null,MainAxisAlignment.spaceEvenly));
     return addDiv(context,false,WrapAlignment.center,MainAxisAlignment.center);
 
   }
 
 
-  Widget addDiv(BuildContext context,bool forceNoBootstrap,WrapAlignment aligment,MainAxisAlignment aligmentBar) {
+  Widget addDiv(BuildContext context,bool forceNoBootstrap,WrapAlignment? aligment,MainAxisAlignment aligmentBar) {
     List<AstorComponente> schemaList = schema.components;
+    bool skipBootstrap = forceNoBootstrap;
     if (isFormFilter(schema)) {
-      forceNoBootstrap=true;
+      skipBootstrap=true;
     }
-    if (useBootstrap && !forceNoBootstrap) {
+    if (useBootstrap && !skipBootstrap) {
       return BootstrapRow(
         height: 60,
         decoration: getResponsiveBoxDecoration(),
@@ -271,7 +250,7 @@ class JSONDiv extends StatelessWidget {
         ],
       );
     else return Wrap(
-        alignment: aligment,
+        alignment: aligment ?? WrapAlignment.center,
         children: [
           for (AstorComponente schema in schemaList.where((element) =>
           !(!element.isVisibleInContext(context) || element.widget == WidgetType.unknown || element.widget == null)))
@@ -283,7 +262,7 @@ class JSONDiv extends StatelessWidget {
     if (comp.inline && comp.visible) {
       return Container(
         padding: const EdgeInsets.all(0),
-        constraints: BoxConstraints(minHeight: 80, minWidth: 300,maxHeight: 80, maxWidth: 300),
+        constraints: const BoxConstraints(minHeight: 80, minWidth: 300,maxHeight: 80, maxWidth: 300),
         child: addComponentInternal(comp,context),
       );
     }
@@ -301,7 +280,7 @@ class JSONDiv extends StatelessWidget {
         child: addWidthComponentInternal(comp,context),
       );
     if (isFull(comp))
-      return Padding(padding: EdgeInsets.only(left: 20, right: 20,),
+      return Padding(padding: const EdgeInsets.only(left: 20, right: 20,),
           child: addWidthComponentInternal(comp,context));
     return addWidthComponentInternal(comp, context);
 
