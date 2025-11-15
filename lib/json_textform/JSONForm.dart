@@ -1,20 +1,20 @@
 
-import 'dart:convert';
 import 'dart:io';
+
 import 'package:astor_mobile/json_textform/components/JSONDiv.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:provider/provider.dart';
-import '../main.dart';
+
 import '/json_textform/components/JSONCheckboxField.dart';
 import '/json_textform/components/JSONDateTimeField.dart';
 import '/json_textform/components/JSONFileField.dart';
 import '/json_textform/components/JSONSelectField.dart';
 import '/json_textform/components/JSONTextFormField.dart';
 import '/json_textform/components/LoadingDialog.dart';
-import '/json_textform/models/components/Action.dart';
 import '/json_textform/models/Controller.dart';
+import '/json_textform/models/components/Action.dart';
 import '/json_textform/utils.dart';
 
 import 'components/JSONActionBar.dart';
@@ -42,78 +42,81 @@ import 'package:astor_mobile/model/astorSchema.dart';
 /// A schema values which represents both schema and its values.
 class SchemaValues {
   /// schema data.
-  AstorComponente schema;
+  final AstorComponente schema;
 
   /// schema's value
-  Map<String, dynamic> values;
+  final Map<String, dynamic> values;
 
-  SchemaValues({@required this.schema, @required this.values});
+  const SchemaValues({required this.schema, required this.values});
 }
-typedef Widget OnBuildBody(AstorComponente comp);
 
+typedef OnBuildBody = Widget Function(AstorComponente comp);
 
-typedef Future<List<AstorItem>> OnSearch(AstorCombo combo, String keyword);
+typedef OnSearch = Future<List<AstorItem>> Function(
+    AstorCombo combo, String keyword);
 
 /// Will be called when user clicks submit button or uses controller to submit
-typedef Future OnSubmit(Map<String, dynamic> json);
-typedef void OnPressed(AstorComponente schema,[BuildContext context]);
-typedef void OnRefereshForm(AstorComponente schema,[BuildContext context]);
+typedef OnSubmit = Future<void> Function(Map<String, dynamic> json);
+typedef OnPressed = void Function(AstorComponente schema,
+    [BuildContext? context]);
+typedef OnRefereshForm = void Function(AstorComponente schema,
+    [BuildContext? context]);
 
 /// Fetch schema based on the [path] and [id].
 /// If this function has been called when user want to edit a foreignkey's value,
 /// then [isEdit] will be true and id will be provided. Otherwise, id will be null.
 ///
 /// This function should return a [schemaValues] which includes both schema and its value.
-typedef Future<SchemaValues> OnFetchingSchema(
+typedef OnFetchingSchema = Future<SchemaValues> Function(
     String path, bool isEdit, dynamic id);
 
 /// Fetch list of foreignkey's selections based on the [path].
 /// This will be called when user want to select a foreignkey(s).
-typedef Future<List<Choice>> OnFetchforeignKeyChoices(String path);
+typedef OnFetchforeignKeyChoices = Future<List<Choice>> Function(String path);
 
 /// This function will be called when user wants
 /// to update a foreign key's value based on the [path].
 ///
 /// [values] and [id] will be provided for you so that you can use them
 /// to do something like making an api request.
-typedef Future<Choice> OnUpdateforeignKeyField(
+typedef OnUpdateforeignKeyField = Future<Choice> Function(
     String path, Map<String, dynamic> values, dynamic id);
 
 /// This function will be called when user wants to add a foreignkey.
 /// The [values] and [path] will be provided so that you can use them
 /// to make a api request.
-typedef Future<Choice> OnAddforeignKeyField(
+typedef OnAddforeignKeyField = Future<Choice> Function(
     String path, Map<String, dynamic> values);
 
 /// Delete a foreignkey based on the [path] and [id]
-typedef Future<Choice> OnDeleteforeignKeyField(String path, dynamic id);
+typedef OnDeleteforeignKeyField = Future<Choice> Function(
+    String path, dynamic id);
 
 /// Open a file based on the platform.
 ///
 /// For example, use [FilePicker] to pick a file on mobile platform
-typedef Future<File> OnFileUpload(String path);
+typedef OnFileUpload = Future<File?> Function(String path);
 
 /// A JSON Schema Form Widget
 /// Which will take a schema input
 /// and generate a form
 class JSONForm extends StatefulWidget {
+  final Widget? loadingDialog;
 
-  final Widget loadingDialog;
+  final OnSearch? onSearch;
 
-  final OnSearch onSearch;
-
-  final OnFileUpload onFileUpload;
+  final OnFileUpload? onFileUpload;
 
   /// [optional] Schema controller.
   /// Call this to get value back from fields if you want to have
   /// your custom submit button.
-  final JSONSchemaController controller;
+  final JSONSchemaController? controller;
 
   /// Schema's name
   /// Use this to identify the actions and icons
   /// if foreignkey text field has the same name as the home screen's field.
   /// Default is null
-  final String schemaName;
+  final String? schemaName;
 
   /// Schema you want to have. This is a JSON object
   /// Using dart's map data structure
@@ -121,22 +124,23 @@ class JSONForm extends StatefulWidget {
 
   /// List of actions. Each field will only have one action.
   /// If not, the last one will replace the first one.
-  final List<FieldAction> actions;
+  final List<FieldAction>? actions;
 
   /// List of icons. Each field will only have one icon.
   /// If not, the last one will replace the first one.
-  final List<FieldIcon> icons;
+  final List<FieldIcon>? icons;
 
   /// Default values for each field
-  final Map<String, dynamic> values;
+  final Map<String, dynamic>? values;
 
   /// Will call this function after user
   /// clicked the submit button
-  final OnSubmit onSubmit;
+  final OnSubmit? onSubmit;
 
-  JSONForm({
-    @required this.schema,
-    @required this.onSearch,
+  const JSONForm({
+    Key? key,
+    required this.schema,
+    this.onSearch,
     this.onSubmit,
     this.icons,
     this.actions,
@@ -144,72 +148,37 @@ class JSONForm extends StatefulWidget {
     this.schemaName,
     this.controller,
     this.loadingDialog,
-    @required this.onFileUpload,
-  });
+    this.onFileUpload,
+  }) : super(key: key);
 
-   @override
-   _JSONSchemaFormState createState() => _JSONSchemaFormState();
+  @override
+  _JSONSchemaFormState createState() => _JSONSchemaFormState();
 }
 
 class _JSONSchemaFormState extends State<JSONForm> {
   bool isLoading = false;
-  bool hasMessage = false;
   final _formKey = GlobalKey<FormState>();
-  BootstrapCol internalDiv;
-
-  _JSONSchemaFormState();
-
-  List<AstorComponente> schemaList = [];
 
   @override
   void initState() {
     super.initState();
 
-    // /// Merge actions
-    // if (widget.actions != null) {
-    //   // if (Platform.isIOS || Platform.isAndroid) {
-    //   //   PermissionHandler()
-    //   //       .requestPermissions([PermissionGroup.camera]).then((m) => null);
-    //   // }
-    //
-    //   schemaList = FieldAction().merge(schemaList, widget.actions, widget.schemaName);
-    // }
-    //
-    // /// Merge icons
-    // if (widget.icons != null) {
-    //   schemaList =
-    //       FieldIcon().merge(schemaList, widget.icons, widget.schemaName);
-    // }
-
-    /// Merge values
-    // if (widget.values != null) {
-    //   schemaList = Schema.mergeValues(schemaList, widget.values);
-    // }
-    // if (widget.controller != null) {
-    //   widget.controller.onSubmit = this.onPressSubmitButton;
-    // }
   }
 
   @override
   void didUpdateWidget(JSONForm oldWidget) {
     super.didUpdateWidget(oldWidget);
-    bool schemaEquals =
-        jsonEncode(widget.schema) == jsonEncode(oldWidget.schema);
-    bool valueEquals =
-        jsonEncode(widget.values) == jsonEncode(oldWidget.values);
   }
 
   /// Render body widget based on widget type
   Widget _buildBodyInternal(AstorComponente schema) {
-    internalDiv = BootstrapCol(
+    return BootstrapCol(
         sizes: 'col-12',
         child: JSONDiv(
           schema: schema,
           onBuildBody: _buildBodyChild,
           onFileUpload: widget.onFileUpload,
-        )
-    );
-    return internalDiv;
+        ));
   }
 
   @override
@@ -223,20 +192,22 @@ class _JSONSchemaFormState extends State<JSONForm> {
             child: SingleChildScrollView(
               child: BootstrapContainer(
                   fluid: true,
-                  children: [ BootstrapRow(
+                  children: [
+                    BootstrapRow(
                       height: 60,
                       children: [
                         _buildBodyInternal(widget.schema),
-                      ]),
+                      ],
+                    ),
                   ]),
             ),
           ),
           if (isLoading)
-            Container(
+            SizedBox(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               child: Center(
-                child: widget.loadingDialog ?? LoadingDialog(),
+                child: widget.loadingDialog ?? const LoadingDialog(),
               ),
             ),
         ],
@@ -567,117 +538,118 @@ class _JSONSchemaFormState extends State<JSONForm> {
           key: Key(schema.name),
           schema: schema,
           onRefreshForm: onRefreshForm,
-          onSaved: (String value) {
-             setState(() {
+          onSaved: (value) {
+            setState(() {
               schema.value = value;
-
             });
           },
         );
     }
-    return Container();
+    return const SizedBox.shrink();
   }
-  void onToggleVisibilityTarget(AstorComponente schema, [BuildContext context]) async {
-
+  void onToggleVisibilityTarget(AstorComponente schema,
+      [BuildContext? ctx]) async {
     try {
-      AstorProvider provider = Provider.of(context,listen: false);
-      AstorComponente comp=provider.astorApp.findName(schema.dataTarget.substring(1));
-      if (comp!=null) {
+      final BuildContext effectiveContext = ctx ?? context;
+      final AstorProvider provider =
+          Provider.of<AstorProvider>(effectiveContext, listen: false);
+      final AstorComponente? comp =
+          provider.astorApp.findName(schema.dataTarget.substring(1));
+      if (comp != null) {
         setState(() {
-          comp.forceVisible= !(comp.visible);
+          comp.forceVisible = !(comp.visible);
         });
       }
-      return ;
+      return;
     } catch (err) {
       rethrow;
     }
   }
 
-  void onPressSubmitButton(AstorComponente schema, [BuildContext context]) async {
+  void onPressSubmitButton(AstorComponente schema, [BuildContext? ctx]) async {
     if (isLoading) {
-      return null;
+      return;
     }
     setState(() {
       isLoading = true;
     });
+    final BuildContext effectiveContext = ctx ?? context;
     try {
-      String actionTarget = schema.actionTarget;
-      bool uploadData = schema.uploadData;
-      bool issubmit = schema.issubmit;
-      String id_action = schema.idAction;
-      bool isRefreshForm = actionTarget.indexOf('do-PartialRefreshForm') != -1;
+      final String actionTarget = schema.actionTarget;
+      final bool uploadData = schema.uploadData;
+      final bool issubmit = schema.issubmit;
+      final String idAction = schema.idAction;
+      final bool isRefreshForm =
+          actionTarget.contains('do-PartialRefreshForm');
+      final FormState? formState = _formKey.currentState;
       if (uploadData && issubmit) {
-        if (id_action != "" && !isRefreshForm) // verificar
-          if (!_formKey.currentState.validate()) {
-            print("Form is not vaild");
+        if (idAction.isNotEmpty && !isRefreshForm) {
+          if (!(formState?.validate() ?? true)) {
+            debugPrint('Form is not valid');
             return;
           }
+        }
       }
 
-      _formKey.currentState.save();
-      // hide keyboard
-      if (context != null) {
-        FocusScope.of(context).requestFocus(FocusNode());
-      }
-      AstorProvider astorProvider = Provider.of(context,listen: false);
-      await astorProvider.doAction(schema,context, null,isRefreshForm?true:null,true);
+      formState?.save();
+      FocusScope.of(effectiveContext).requestFocus(FocusNode());
+      final AstorProvider astorProvider =
+          Provider.of<AstorProvider>(effectiveContext, listen: false);
+      await astorProvider.doAction(
+          schema, effectiveContext, null, isRefreshForm ? true : null, true);
 
       if (mounted) {
         setState(() {
           isLoading = false;
         });
-        // clear the content
-        _formKey.currentState.reset();
+        _formKey.currentState?.reset();
       }
-      return ;
+      return;
     } catch (err) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           isLoading = false;
         });
+      }
       rethrow;
     }
   }
 
-  void onRefreshForm(AstorComponente schema, [BuildContext context]) async {
-     if (isLoading) {
-       return null;
-     }
-     setState(() {
-       isLoading = true;
-     });
-     try {
+  void onRefreshForm(AstorComponente schema, [BuildContext? ctx]) async {
+    if (isLoading) {
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    final BuildContext effectiveContext = ctx ?? context;
+    try {
+      _formKey.currentState?.save();
+      FocusScope.of(effectiveContext).requestFocus(FocusNode());
+      final AstorProvider astorProvider =
+          Provider.of<AstorProvider>(effectiveContext, listen: false);
+      if (schema.name.contains('_filter_pane_') || schema.noForm) {
+        await astorProvider.doAction(
+            schema, effectiveContext, schema.actionTarget, true, false);
+      } else {
+        await astorProvider.doAction(
+            schema, effectiveContext, 'do-PartialRefreshForm', true, false);
+      }
 
-
-       _formKey.currentState.save();
-       // hide keyboard
-       if (context != null) {
-         FocusScope.of(context).requestFocus(FocusNode());
-       }
-    // <xsl:when test="starts-with(@form_name,'filter_pane') or (@noform='true')">
-    // goToRefreshForm('do-WinListRefreshAction
-    //
-       AstorProvider astorProvider = Provider.of(context,listen: false);
-       if (schema.name.indexOf('_filter_pane_')!=-1 || schema.noForm)
-         await astorProvider.doAction(schema,context, schema.actionTarget,true,false);
-       else
-         await astorProvider.doAction(schema,context, 'do-PartialRefreshForm',true, false);
-
-       if (mounted) {
-         setState(() {
-           isLoading = false;
-         });
-         _formKey.currentState.reset();
-       }
-       return ;
-     } catch (err) {
-       if (mounted)
-         setState(() {
-           isLoading = false;
-         });
-       rethrow;
-     }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        _formKey.currentState?.reset();
+      }
+      return;
+    } catch (err) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      rethrow;
+    }
   }
-
-
 }
