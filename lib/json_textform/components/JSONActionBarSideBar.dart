@@ -13,7 +13,7 @@ class JSONActionBarSideBar extends StatelessWidget {
   final OnPressed onPressed;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  const JSONActionBarSideBar({
+   JSONActionBarSideBar({
     Key? key,
     required this.schema,
     required this.onPressed,
