@@ -1,4 +1,3 @@
-
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
 import '../JSONDiv.dart';
@@ -9,13 +8,12 @@ class NewPage extends StatefulWidget {
   final OnBuildBody onBuildBody;
   final String title;
 
-
-  NewPage({
-    this.title,
-    this.schema,
-    this.onBuildBody,
-
-  });
+  const NewPage({
+    Key? key,
+    required this.title,
+    required this.schema,
+    required this.onBuildBody,
+  }) : super(key: key);
 
   @override
   _NewPageState createState() => _NewPageState();
@@ -33,8 +31,8 @@ class _NewPageState extends State<NewPage> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("${widget.title}"),
-      content: Container(
+      title: Text(widget.title),
+      content: SizedBox(
         width: 600,
         child: JSONDiv(
           schema: widget.schema,
@@ -42,25 +40,25 @@ class _NewPageState extends State<NewPage> {
         ),
       ),
       actions: [
-        FlatButton(
-          key: Key("Back"),
+        TextButton(
+          key: const Key("Back"),
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text("Cancel"),
+          child: const Text("Cancel"),
         ),
-        // FlatButton(
+        // Si en algún momento querés reactivar el OK:
+        // TextButton(
         //   onPressed: () {
         //     _onDone(context);
         //   },
-        //   child: Text("Ok"),
+        //   child: const Text("Ok"),
         // )
       ],
     );
   }
 
-
   // void _onDone(BuildContext context) {
-  //  Navigator.pop(context);
+  //   Navigator.pop(context);
   // }
 }

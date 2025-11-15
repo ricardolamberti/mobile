@@ -1365,44 +1365,7 @@ class AstorComponente {
 
         switch (s.widget) {
 
-          // case WidgetType.select:
-          //   Choice choice = s.extra?.choices?.firstWhere(
-          //         (c) => c.value == value,
-          //     orElse: () => null,
-          //   );
-          //   s.choice = choice;
-          //   s.value = value;
-          //   break;
-          // case WidgetType.foreignkey:
-          //   try {
-          //     Choice choice = Choice.fromJSON(value);
-          //     s.choice = choice;
-          //     s.value = choice.value;
-          //   } catch (err) {
-          //     print(err);
-          //   }
-          //   break;
-          // case WidgetType.manytomanyLists:
-          //   if (value is List) {
-          //     List<Choice> choices = [];
-          //     if (value.length > 0) {
-          //       if (value.first is num) {
-          //         choices =
-          //             value.map((e) => Choice(label: null, value: e)).toList();
-          //         s.choices = choices;
-          //         s.value = choices.map((e) => e.value).toList();
-          //         break;
-          //       }
-          //     }
-          //     choices = value.map(
-          //           (e) => Choice.fromJSON(e),
-          //     ).toList();
-          //
-          //     s.choices = choices;
-          //     s.value = choices.map((e) => e.value).toList();
-          //   }
-          //   break;
-
+        
           case WidgetType.text:
           case WidgetType.number:
           case WidgetType.datetime:
@@ -1412,6 +1375,9 @@ class AstorComponente {
           case WidgetType.url:
             s.value = value;
             break;
+          default:
+          break;
+         
         }
       }
       return s;

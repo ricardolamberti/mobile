@@ -1,4 +1,3 @@
-
 import 'package:astor_mobile/astorScreen.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
@@ -11,36 +10,34 @@ import '../JSONForm.dart';
 import 'JSONDiv.dart';
 import 'JSONIcon.dart';
 
-typedef void OnChange(bool value);
+// Puedes dejar el typedef así, sigue siendo válido con null-safety
+typedef OnChange = void Function(bool value);
 
 class JSONActionBar extends StatelessWidget {
   final AstorComponente schema;
-  final OnChange onSaved;
+  final OnChange? onSaved;
   final OnPressed onPressed;
   final OnBuildBody onBuildBody;
 
-  JSONActionBar({
-    @required this.schema,
-    @required this.onBuildBody,
-    @required this.onPressed,
+  const JSONActionBar({
+    Key? key,
+    required this.schema,
+    required this.onBuildBody,
+    required this.onPressed,
     this.onSaved,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    return Column(
       children: <Widget>[
         JSONDiv(
           schema: schema,
           useBootstrap: false,
           actionBar: true,
           onBuildBody: onBuildBody,
-        )
+        ),
       ],
     );
   }
-
-
-
 }
-
