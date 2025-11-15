@@ -1,10 +1,11 @@
 
 import 'package:flutter/material.dart';
+
 import '../../../model/astorSchema.dart';
 
 import 'Icon.dart';
 
-typedef Future<String> OnActionTap(AstorComponente schema);
+typedef OnActionTap = Future<String> Function(AstorComponente schema);
 
 /// Actions type
 enum ActionTypes { image, qrScan, custom }
@@ -24,23 +25,23 @@ typedef OnDone<T> = Future<dynamic> Function(T value);
 
 /// Field Action class for each json field
 class FieldAction<T> implements Field<FieldAction> {
-  IconData icon;
-  ActionTypes actionTypes;
-  ActionDone actionDone;
-  final OnDone<T> onDone;
-  final OnActionTap onActionTap;
+  final IconData icon;
+  final ActionTypes actionTypes;
+  final ActionDone? actionDone;
+  final OnDone<T>? onDone;
+  final OnActionTap? onActionTap;
   @override
-  String schemaName;
+  final String? schemaName;
 
   @override
-  String schemaFor;
+  final String? schemaFor;
 
   @override
-  bool useGlobally;
+  final bool useGlobally;
 
-  FieldAction({
+  const FieldAction({
     this.actionDone,
-    @required this.actionTypes,
+    required this.actionTypes,
     this.schemaName,
     this.onDone,
     this.useGlobally = true,
@@ -63,7 +64,7 @@ class FieldAction<T> implements Field<FieldAction> {
   List<AstorComponente> merge(
       List<AstorComponente> schemas, List<FieldAction> fields, String name) {
     return schemas.map((s) {
-      fields.forEach((f) {
+      for (final f in fields) {
         if (f.schemaName == s.name) {
           if ((f.schemaFor == null && f.useGlobally) || f.schemaFor == name) {
             s.action = f;
@@ -72,7 +73,7 @@ class FieldAction<T> implements Field<FieldAction> {
             s.action = f;
           }
         }
-      });
+      }
       return s;
     }).toList();
   }

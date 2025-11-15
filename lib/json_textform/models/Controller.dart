@@ -1,8 +1,9 @@
 
 import 'package:flutter/material.dart';
 
-typedef Future<Map<String, dynamic>> OnControllerSubmit([BuildContext context]);
+typedef OnControllerSubmit = Future<Map<String, dynamic>> Function(
+    [BuildContext? context]);
 
 class JSONSchemaController {
-  OnControllerSubmit onSubmit;
+  OnControllerSubmit? onSubmit;
 }
