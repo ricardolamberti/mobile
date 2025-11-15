@@ -1,35 +1,29 @@
 
-import 'package:astor_mobile/astorScreen.dart';
-import 'package:astor_mobile/json_textform/components/JSONDropDownButton.dart';
 import 'package:astor_mobile/json_textform/utils-components/OutlineButtonContainer.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
-
-import '../../main.dart';
 import '../JSONForm.dart';
-import 'JSONDiv.dart';
-import 'JSONIcon.dart';
 
-typedef void OnChange(bool value);
+typedef OnChange = void Function(bool value);
 
 class JSONSwap extends StatefulWidget implements InterfaceProvider {
   final AstorSwap schema;
-  final OnChange onSaved;
+  final OnChange? onSaved;
   final OnPressed onPressed;
   final OnBuildBody onBuildBody;
-  bool isMultiple = false;
-  bool clearSelection = false;
+  final bool isMultiple;
+  final bool clearSelection;
 
-  JSONSwap({
-    @required this.schema,
-    @required this.onBuildBody,
-    @required this.onPressed,
+  const JSONSwap({
+    Key? key,
+    required this.schema,
+    required this.onBuildBody,
+    required this.onPressed,
     this.onSaved,
-  });
+    this.isMultiple = false,
+    this.clearSelection = false,
+  }) : super(key: key);
   @override
   _JSONSwapState createState() => _JSONSwapState();
 
@@ -39,13 +33,13 @@ class JSONSwap extends StatefulWidget implements InterfaceProvider {
   }
 
   @override
-  String getCurrentActionOwner() {
+  String? getCurrentActionOwner() {
      return getMultipleCurrentActionOwner();
 
   }
 
   @override
-  String getCurrentActionOwnerFromSelect() {
+  String? getCurrentActionOwnerFromSelect() {
     for (AstorItem schemaRows in schema.destino) {
       return schemaRows.id;
     }
@@ -53,7 +47,7 @@ class JSONSwap extends StatefulWidget implements InterfaceProvider {
   }
 
   @override
-  String getMultipleActionOwnerList() {
+  String? getMultipleActionOwnerList() {
     String output="";
     for (AstorItem schemaRows in schema.destino) {
       output+= schemaRows.id+";";
@@ -61,34 +55,34 @@ class JSONSwap extends StatefulWidget implements InterfaceProvider {
     return output;
   }
 
-  String getMultipleCurrentActionOwner() {
+  String? getMultipleCurrentActionOwner() {
     return schema.actionOwner;
   }
 
   @override
-  String getMultipleCurrentActionOwnerDest() {
+  String? getMultipleCurrentActionOwnerDest() {
     return schema.actionOwnerDest;
   }
 
   @override
-  String getSelectedCell() {
+  String? getSelectedCell() {
 
     return null;
   }
 
   @override
-  String getSelectedRow() {
+  String? getSelectedRow() {
 
     return null;
   }
 
   @override
-  String getSelection() {
+  String? getSelection() {
     return getMultipleActionOwnerList();
   }
 
   @override
-  String getSelectionSpecial(String specialselector) {
+  String? getSelectionSpecial(String specialselector) {
 
     return '';
   }
@@ -111,18 +105,10 @@ class JSONSwap extends StatefulWidget implements InterfaceProvider {
 }
 
 class _JSONSwapState extends State<JSONSwap> {
-  bool isLoading = false;
-  final _formKey = GlobalKey<FormState>();
-
-  _JSONSwapState();
-
-  List<AstorComponente> schemaList = [];
-
   @override
   void initState() {
     super.initState();
     //updateActions(false);
-
   }
 
 
@@ -137,8 +123,12 @@ class _JSONSwapState extends State<JSONSwap> {
 
   @override
   Widget build(BuildContext context) {
-    List<AstorItem> left =  widget.schema.origen.where((element) => element.visible).toList(growable: true);
-    List<AstorItem> right =  widget.schema.destino.where((element) => element.visible).toList(growable: true);
+    final left = widget.schema.origen
+        .where((element) => element.visible)
+        .toList(growable: true);
+    final right = widget.schema.destino
+        .where((element) => element.visible)
+        .toList(growable: true);
     return Row(
       children: [
         Expanded(
@@ -148,56 +138,56 @@ class _JSONSwapState extends State<JSONSwap> {
             isFilled: false,
             child: Column(
               children: [
-                Container( height: 40,width: double.infinity,child:TextField(
-                  enabled: true,
-                  key: Key("search_left"),
-
-                  decoration: InputDecoration(
+                SizedBox(
+                  height: 40,
+                  width: double.infinity,
+                  child: TextField(
+                    enabled: true,
+                    key: const Key('search_left'),
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'search..'
+                      hintText: 'search..',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        widget.schema.filterLeft(value);
+                      });
+                    },
                   ),
-                  onChanged: (value) {setState(() {
-                    widget.schema.filterLeft(value);
-                  });
-                  },
-                )),Divider(),
-                Container (
-                    height: 500,
-                    width: double.infinity,
-                    //   child: SingleChildScrollView(
-                    child:  ListView.builder(
-                          itemCount: left.length,
-                          itemBuilder: (context, index) {
-                            final item = left[index];
-                            return ListTile(
-                              title: Text("->"+item.descripcion),
-                              selected: item.selected,
-                              selectedTileColor: Colors.blue,
-                              onTap: () {
-                                setState(() {
-                                  item.selected=!item.selected;
-                                });
-                              },
-                              onLongPress: () {
-                                setState(() {
-                                  item.selected=true;
-                                  toRight(widget.schema.origen.where((element) => element.selected==true).toList());
-                                });
-                              },
+                ),
+                const Divider(),
+                SizedBox(
+                  height: 500,
+                  width: double.infinity,
+                  child: ListView.builder(
+                    itemCount: left.length,
+                    itemBuilder: (context, index) {
+                      final item = left[index];
+                      return ListTile(
+                        title: Text('->${item.descripcion}'),
+                        selected: item.selected,
+                        selectedTileColor: Colors.blue,
+                        onTap: () {
+                          setState(() {
+                            item.selected = !item.selected;
+                          });
+                        },
+                        onLongPress: () {
+                          setState(() {
+                            item.selected = true;
+                            toRight(
+                              widget.schema.origen
+                                  .where((element) => element.selected)
+                                  .toList(),
                             );
-                          },
-                        ),
-
-                    )
-
-                  //  ),
-
-
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
-
             )
-
-
           ),
         ),
         Expanded(
@@ -212,76 +202,107 @@ class _JSONSwapState extends State<JSONSwap> {
                 TextButton(
                     onPressed: () {
                       setState(() {
-                        toRight(widget.schema.origen.where((element) => element.visible).toList());
+                        toRight(widget.schema.origen
+                            .where((element) => element.visible)
+                            .toList());
                       });
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.all(15),
+                      ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
-                          side: BorderSide(color: Colors.blue),
+                          side: const BorderSide(color: Colors.blue),
                         ),
                       ),
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.blue),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
                     ),
-                    child: Text('>>')),Divider(),
+                    child: const Text('>>')),
+                const Divider(),
                 TextButton(
                     onPressed: () {
                       setState(() {
-                        toRight(widget.schema.origen.where((element) => element.selected==true&&element.visible).toList());
+                        toRight(
+                          widget.schema.origen
+                              .where((element) => element.selected && element.visible)
+                              .toList(),
+                        );
                       });
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.all(15),
+                      ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
-                          side: BorderSide(color: Colors.blue),
+                          side: const BorderSide(color: Colors.blue),
                         ),
                       ),
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.blue),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
                     ),
-                    child: Text('->')),Divider(),
+                    child: const Text('->')),
+                const Divider(),
                 TextButton(
                     onPressed: () {
                       setState(() {
-                        toLeft(widget.schema.destino.where((element) => element.selected==true&&element.visible).toList());
+                        toLeft(
+                          widget.schema.destino
+                              .where((element) => element.selected && element.visible)
+                              .toList(),
+                        );
                       });
 
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.all(15),
+                      ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
-                          side: BorderSide(color: Colors.blue),
+                          side: const BorderSide(color: Colors.blue),
                         ),
                       ),
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.blue),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
                     ),
-                    child: Text('<-')),Divider(),
+                    child: const Text('<-')),
+                const Divider(),
                 TextButton(
                     onPressed: () {
                       setState(() {
-                        toLeft(widget.schema.destino.where((element) => element.visible).toList());
+                        toLeft(widget.schema.destino
+                            .where((element) => element.visible)
+                            .toList());
                       });
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(15)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.all(15),
+                      ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
-                          side: BorderSide(color: Colors.blue),
+                          side: const BorderSide(color: Colors.blue),
                         ),
                       ),
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.blue),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
                     ),
-                    child: Text('<<')),
+                    child: const Text('<<')),
               ],
             ),
           ),
@@ -291,51 +312,55 @@ class _JSONSwapState extends State<JSONSwap> {
             child: OutlineButtonContainer(
               isOutlined: true,
               isFilled: false,
-              child:      Column(
-
+              child: Column(
                 children: [
-                  Container( height: 40,width: double.infinity,child:TextField(
-                    enabled: true,
-                    key: Key("search_right"),
-                    onChanged: (value) {
-                      setState(() {
-                        widget.schema.filterRight(value);
-                      });
-                    },
-                    decoration: InputDecoration(
+                  SizedBox(
+                    height: 40,
+                    width: double.infinity,
+                    child: TextField(
+                      enabled: true,
+                      key: const Key('search_right'),
+                      onChanged: (value) {
+                        setState(() {
+                          widget.schema.filterRight(value);
+                        });
+                      },
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'search..'
-                    ),
-
-                  )), Divider(),Container (
-                      height: 500,
-                      width: double.infinity,
-                      // width:100,
-                      // child: SingleChildScrollView(
-                      child:ListView.builder(
-                        itemCount: right.length,
-                        itemBuilder: (context, index) {
-                          final item = right[index];
-
-                          return ListTile(
-                            // selectedTileColor: Colors.blue,
-                            selected: item.selected,
-                            title: Text("->"+item.descripcion),
-                            onTap: () {
-                              setState(() {
-                                item.selected=!item.selected;
-                              });
-                            },
-                            onLongPress: () {
-                              setState(() {
-                                item.selected=true;
-                                toLeft(widget.schema.destino.where((element) => element.selected==true).toList());
-                              });
-                            },
-                          );
-                        },
+                        hintText: 'search..',
                       ),
+                    ),
+                  ),
+                  const Divider(),
+                  SizedBox(
+                    height: 500,
+                    width: double.infinity,
+                    child: ListView.builder(
+                      itemCount: right.length,
+                      itemBuilder: (context, index) {
+                        final item = right[index];
 
+                        return ListTile(
+                          selected: item.selected,
+                          title: Text('->${item.descripcion}'),
+                          onTap: () {
+                            setState(() {
+                              item.selected = !item.selected;
+                            });
+                          },
+                          onLongPress: () {
+                            setState(() {
+                              item.selected = true;
+                              toLeft(
+                                widget.schema.destino
+                                    .where((element) => element.selected)
+                                    .toList(),
+                              );
+                            });
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
