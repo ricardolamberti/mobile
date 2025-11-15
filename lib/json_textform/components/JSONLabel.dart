@@ -10,50 +10,51 @@ class JSONLabel extends StatelessWidget {
   final AstorComponente schema;
   final OnBuildBody onBuildBody;
 
-  JSONLabel({
-    @required this.schema,
-    @required this.onBuildBody,
-  });
+  const JSONLabel({
+    Key? key,
+    required this.schema,
+    required this.onBuildBody,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String title ="";
-    if (schema.type=="text_label_responsive")
-      title=schema.value;
-    else
+    String? title;
+    if (schema.type == "text_label_responsive") {
+      title = schema.value;
+    } else {
       title = schema.title;
-    bool composite = schema.composite;
-    double size = schema.sizeHResponsive;
+    }
+    final bool composite = schema.composite == true;
+    final double? size = schema.sizeHResponsive;
     if (composite) {
       return Column(
-        children:  <Widget>[
+        children: <Widget>[
           ListTile(
-
-            leading: !schema.hasIcon?null:JSONIcon(schema:schema),
-            title: title==null?Container():Text (
-                title, style: TextStyle (
-                fontSize: size
-            )
-            ),
-        ),
-            JSONDiv(
-              schema: schema,
-              useBootstrap: false,
-              actionBar: false,
-              onBuildBody: onBuildBody,
-            )
+            leading: schema.hasIcon == true ? JSONIcon(schema: schema) : null,
+            title: title == null
+                ? Container()
+                : Text(
+                    title,
+                    style: TextStyle(fontSize: size),
+                  ),
+          ),
+          JSONDiv(
+            schema: schema,
+            useBootstrap: false,
+            actionBar: false,
+            onBuildBody: onBuildBody,
+          )
         ],
-
       );
     }
-    return   ListTile(
-      leading: JSONIcon(schema:schema),
-      title: title==null?Container():Text (
-        title, style: TextStyle (
-        fontSize: size
-      )
-      ),
-
+    return ListTile(
+      leading: JSONIcon(schema: schema),
+      title: title == null
+          ? Container()
+          : Text(
+              title,
+              style: TextStyle(fontSize: size),
+            ),
     );
   }
 }
