@@ -12,17 +12,17 @@ import 'package:reflectable/reflectable.dart';
 
 import '../../main.dart';
 
-typedef void OnChange(bool value);
+typedef OnChange = void Function(bool value);
 
 class JSONIcon extends StatelessWidget {
   final AstorComponente schema;
-  final double size;
+  final double? size;
 
-
-  JSONIcon({
-    @required this.schema,
+  const JSONIcon({
+    Key? key,
+    required this.schema,
     this.size,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,65 +30,75 @@ class JSONIcon extends StatelessWidget {
     final String iconSource = schema.iconSource;
     final String iconFile = schema.iconFile;
     final String iconClassImage = schema.iconClassImage;
-    if (iconFile==''&&iconClassImage=='')
-       return Icon(null);
-    if (iconSource == 'responsive'||iconClassImage!='') {
-       String nameIcon =iconFile==''?iconClassImage:iconFile;
-       final iconData = convertIcon(nameIcon);
-       if (nameIcon==''||iconData==null)
-          return FaIcon(FontAwesomeIcons.circle, size: size);
-       return FaIcon(iconData, size: size);
+    if (iconFile == '' && iconClassImage == '') {
+      return const Icon(null);
     }
-    else if (iconSource == 'pss_icon')
+    if (iconSource == 'responsive' || iconClassImage != '') {
+      final String nameIcon = iconFile == '' ? iconClassImage : iconFile;
+      final iconData = convertIcon(nameIcon);
+      if (nameIcon == '' || iconData == null) {
+        return FaIcon(FontAwesomeIcons.circle, size: size);
+      }
+      return FaIcon(iconData, size: size);
+    } else if (iconSource == 'pss_icon') {
       return Image.network(iconPath + '/pss_icon/' + iconFile);
-    else if (iconSource == 'pssdata_resource')
+    } else if (iconSource == 'pssdata_resource') {
       return Image.network(iconPath + '/pssdata_resource/' + iconFile);
-    else if (iconSource == 'webapp_url') {
-       if (iconFile.startsWith("data:image/")) {
-          var image = base64Decode(iconFile.substring(iconFile.indexOf("base64,")+7).replaceAll("\n", ""));
-          return Image.memory(image);
-       }
-       return Image.network(iconFile);
-    } else if (iconSource == 'pss_data')
+    } else if (iconSource == 'webapp_url') {
+      if (iconFile.startsWith("data:image/")) {
+        final image = base64Decode(
+          iconFile
+              .substring(iconFile.indexOf("base64,") + 7)
+              .replaceAll("\n", ""),
+        );
+        return Image.memory(image);
+      }
+      return Image.network(iconFile);
+    } else if (iconSource == 'pss_data') {
       return Image.network(iconPath + '/pss_data/' + iconFile);
-    else
+    } else {
       return Image.network(iconPath + '/' + iconFile);
+    }
   }
 
-  IconData convertIcon(String name) {
-     int posIcon=1;
-    List<String> list = name.split(" ");
-    if (list.length==1)
-       return null;
-    else if (list.length==2 && list[1].length>3 && list[1]!='fa-fw')
-        posIcon=1;
-    else  if (list.length==3 && list[1].length>3 && list[1]!='fa-fw')
-        posIcon=1;
-    else  if (list.length==3 && list[2].length>3 && list[2]!='fa-fw')
-        posIcon=2;
-    else  if (list.length>=4 && list[1].length>3 && list[1]!='fa-fw')
-       posIcon=1;
-    else  if (list.length>=4 && list[2].length>3 && list[2]!='fa-fw')
-       posIcon=2;
-    else  if (list.length>=4 && list[3].length>3 && list[3]!='fa-fw')
-        posIcon=3;
-    String nameIcon = list[posIcon].replaceAll("-", "").toLowerCase().substring(2);
-    IconData icon= findIcon(nameIcon);
-    if (icon!=null) return icon;
-    return null;
+  IconData? convertIcon(String name) {
+    int posIcon = 1;
+    final List<String> list = name.split(" ");
+    if (list.length == 1) {
+      return null;
+    } else if (list.length == 2 && list[1].length > 3 && list[1] != 'fa-fw') {
+      posIcon = 1;
+    } else if (list.length == 3 && list[1].length > 3 && list[1] != 'fa-fw') {
+      posIcon = 1;
+    } else if (list.length == 3 && list[2].length > 3 && list[2] != 'fa-fw') {
+      posIcon = 2;
+    } else if (list.length >= 4 && list[1].length > 3 && list[1] != 'fa-fw') {
+      posIcon = 1;
+    } else if (list.length >= 4 && list[2].length > 3 && list[2] != 'fa-fw') {
+      posIcon = 2;
+    } else if (list.length >= 4 && list[3].length > 3 && list[3] != 'fa-fw') {
+      posIcon = 3;
+    }
+    final String nameIcon =
+        list[posIcon].replaceAll("-", "").toLowerCase().substring(2);
+    return findIcon(nameIcon);
   }
-  static Map<String,IconData>  icons;
 
-  static addIcon(String name,IconData data) {
-   icons[name.toLowerCase()]=data;
+  static Map<String, IconData>? icons;
+
+  static void addIcon(String name, IconData data) {
+    icons ??= <String, IconData>{};
+    icons![name.toLowerCase()] = data;
   }
-  static IconData  findIcon(String name) {
-     return buildDictionary()[name];
+
+  static IconData? findIcon(String name) {
+    return buildDictionary()[name];
   }
+
   // francase por injection, lo hice con el notepad++
-  static Map<String,IconData>  buildDictionary() {
-     if (icons!=null) return icons;
-     icons = Map<String,IconData>();
+  static Map<String, IconData> buildDictionary() {
+    if (icons != null) return icons!;
+    icons = <String, IconData>{};
      addIcon("fiveHundredPx",FontAwesomeIcons.fiveHundredPx);
      addIcon("accessibleIcon",FontAwesomeIcons.accessibleIcon);
      addIcon("accusoft",FontAwesomeIcons.accusoft);
@@ -1699,6 +1709,6 @@ class JSONIcon extends StatelessWidget {
      addIcon("youtube",FontAwesomeIcons.youtube);
      addIcon("youtubeSquare",FontAwesomeIcons.youtubeSquare);
      addIcon("zhihu",FontAwesomeIcons.zhihu);
-      return icons;
+      return icons!;
   }
 }
