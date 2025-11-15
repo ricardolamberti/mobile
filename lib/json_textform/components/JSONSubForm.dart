@@ -1,9 +1,14 @@
+import 'package:astor_mobile/json_textform/models/components/AvaliableWidgetTypes.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 
 import '../JSONForm.dart';
+
+// Stub mínimo para evitar error de clase indefinida.
+// Si tenés un controlador real en otro archivo, importalo y borra esto.
+class JSONSchemaController {}
 
 class JSONSubForm extends StatelessWidget implements InterfaceProvider {
   final AstorComponente schema;
@@ -25,7 +30,7 @@ class JSONSubForm extends StatelessWidget implements InterfaceProvider {
   final bool inline;
 
   const JSONSubForm({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     this.values,
@@ -42,47 +47,49 @@ class JSONSubForm extends StatelessWidget implements InterfaceProvider {
     this.onDeleteforeignKeyField,
     this.useBootstrap = true,
     this.inline = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final schemaList = schema.components;
+
     if (useBootstrap) {
       return BootstrapRow(
         height: 60,
         children: [
-          for (final schema in schemaList.where(
-            (element) =>
-                element.widget != WidgetType.unknown && element.widget != null,
+          for (final comp in schemaList.where(
+            (element) => element.widget != null,
           ))
             BootstrapCol(
-              sizes: schema.sizeResponsive,
-              child: onBuildBody(schema),
-            )
+              sizes: comp.sizeResponsive,
+              child: onBuildBody(comp),
+            ),
         ],
       );
     } else if (inline) {
       return ButtonBar(
         children: [
-          for (final schema in schemaList.where(
-            (element) =>
-                element.widget != WidgetType.unknown && element.widget != null,
+          for (final comp in schemaList.where(
+            (element) => element.widget != null,
           ))
-            onBuildBody(schema)
+            onBuildBody(comp),
         ],
       );
     } else {
       return Column(
         children: [
-          for (final schema in schemaList.where(
+          for (final comp in schemaList.where(
             (element) =>
-                element.widget != WidgetType.unknown && element.widget != null,
+                element.widget != null &&
+                element.widget != WidgetType.unknown,
           ))
-            onBuildBody(schema)
+            onBuildBody(comp),
         ],
       );
     }
   }
+
+  // -------- InterfaceProvider implementation --------
 
   @override
   bool getClearSelection() {

@@ -39,6 +39,15 @@ class FieldAction<T> implements Field<FieldAction> {
   @override
   final bool useGlobally;
 
+  @override
+  set schemaName(String? value) {}
+
+  @override
+  set schemaFor(String? value) {}
+
+  @override
+  set useGlobally(bool value) {}
+
   const FieldAction({
     this.actionDone,
     required this.actionTypes,

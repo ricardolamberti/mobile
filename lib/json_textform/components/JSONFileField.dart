@@ -1,35 +1,34 @@
-
 import 'dart:io';
 
-// import 'package:file_picker/file_picker.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
 import '../models/components/FileFieldValue.dart';
 import '../utils-components/OutlineButtonContainer.dart';
-
 import '../JSONForm.dart';
 
-typedef void OnChange(FileFieldValue value);
+typedef OnChange = void Function(FileFieldValue value);
 
 class JSONFileField extends StatelessWidget {
-  final OnFileUpload onFileUpload;
+  /// Callback opcional para subir el archivo de forma personalizada
+  final OnFileUpload? onFileUpload;
+
   final AstorComponente schema;
-  final OnChange onSaved;
+  final OnChange? onSaved;
   final bool showIcon;
   final bool isOutlined;
   final bool filled;
-  final Key key;
 
-  JSONFileField({
-    @required this.schema,
-    @required this.onFileUpload,
-    this.key,
+  const JSONFileField({
+    super.key,
+    required this.schema,
+    this.onFileUpload,
     this.onSaved,
     this.showIcon = true,
     this.isOutlined = false,
     this.filled = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class JSONFileField extends StatelessWidget {
     if (schema.value == null) {
       value = FileFieldValue();
     } else if (schema.value is! FileFieldValue) {
-      return Padding(
+      return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 4),
         child: Text(
           "Value is not supported",
@@ -45,14 +44,14 @@ class JSONFileField extends StatelessWidget {
         ),
       );
     } else {
-      value = schema.value;
+      value = schema.value as FileFieldValue;
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
       child: OutlineButtonContainer(
-        isFilled: false,
-        isOutlined: true,
+        isFilled: filled,
+        isOutlined: isOutlined,
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(
@@ -64,7 +63,7 @@ class JSONFileField extends StatelessWidget {
                   Expanded(
                     child: Wrap(
                       children: <Widget>[
-                        if (value.path != null)
+                        if (value.path != null && value.path!.isNotEmpty)
                           Chip(
                             label: Text(
                               "Old: ${value.path}",
@@ -76,11 +75,11 @@ class JSONFileField extends StatelessWidget {
                               ),
                             ),
                             deleteIcon: !value.willClear
-                                ? Icon(
+                                ? const Icon(
                                     Icons.cancel,
                                     key: Key("Delete Old"),
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.restore,
                                     key: Key("Restore"),
                                   ),
@@ -90,53 +89,75 @@ class JSONFileField extends StatelessWidget {
                               } else {
                                 value.clearOld();
                               }
-                              onSaved(value);
+                              onSaved?.call(value);
                             },
                           ),
-                        SizedBox(
-                          width: 10,
-                        ),
+                        const SizedBox(width: 10),
                         if (value.file != null)
                           Chip(
                             label: Text(
-                              "New: ${value.file.path}",
+                              "New: ${value.file!.path}",
                               maxLines: 1,
                             ),
-                            deleteIcon: Icon(
+                            deleteIcon: const Icon(
                               Icons.cancel,
                               key: Key("Delete New"),
                             ),
                             onDeleted: () {
                               value.clearNew();
-                              onSaved(value);
+                              onSaved?.call(value);
                             },
-                          )
+                          ),
                       ],
                     ),
                   ),
                   IconButton(
-                    key: Key("Upload"),
+                    key: const Key("Upload"),
+                    icon: const Icon(Icons.file_upload),
                     onPressed: () async {
-                      File file;
+                      File? file;
+
+                      // Si el caller provee su propio uploader, lo usamos
                       if (onFileUpload != null) {
-                        file = await onFileUpload(schema.name);
+                        file = await onFileUpload!(schema.name);
                       } else {
+                        // Fallback usando file_picker
                         try {
-                          FilePickerCross filePickerCross = await FilePickerCross.pick();
-                          file = File(filePickerCross.path);
-                        } catch (err) {}
+                          final result =
+                              await FilePicker.platform.pickFiles();
+
+                          if (result == null || result.files.isEmpty) {
+                            return;
+                          }
+
+                          final picked = result.files.first;
+
+                          // En móvil deberías tener path; en web puede ser sólo bytes
+                          if (picked.path == null) {
+                            // Si querés soportar web con bytes, acá habría que adaptar FileFieldValue
+                            return;
+                          }
+
+                          file = File(picked.path!);
+                        } catch (err) {
+                          // podrías loguear el error si querés
+                          return;
+                        }
                       }
+
+                      if (file == null) {
+                        return;
+                      }
+
                       value.file = file;
-                      if (file != null) {
-                        onSaved(value);
-                      }
+                      onSaved?.call(value);
                     },
-                    icon: Icon(Icons.file_upload),
-                  )
+                  ),
                 ],
               ),
               Divider(
-                color: Theme.of(context).textTheme.bodyText1.color,
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.black,
               ),
             ],
           ),

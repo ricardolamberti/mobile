@@ -15,7 +15,7 @@ abstract class Field<T> {
 
   /// If this is true and schemaFor is null, then use the icon/action globally,
   /// otherwise, only main screen will use the icon/action
-  bool useGlobally;
+  bool useGlobally=false;
 
   /// Merge with schema
   List<AstorComponente> merge(
@@ -26,19 +26,23 @@ class FieldIcon implements Field<FieldIcon> {
   final IconData? iconData;
 
   @override
-  final String? schemaName;
+  late String? schemaName;
 
   @override
-  final String? schemaFor;
+  late String? schemaFor;
 
   @override
-  final bool useGlobally;
+  late bool useGlobally;
 
-  const FieldIcon(
+  FieldIcon(
       {this.iconData,
-      this.schemaName,
-      this.schemaFor,
-      this.useGlobally = true});
+      String? schemaName,
+      String? schemaFor,
+      bool useGlobally = true}) {
+    this.schemaName = schemaName;
+    this.schemaFor = schemaFor;
+    this.useGlobally = useGlobally;
+  }
 
   @override
   List<AstorComponente> merge(

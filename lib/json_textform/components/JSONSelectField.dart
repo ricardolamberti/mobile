@@ -20,20 +20,20 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
   final bool useRadioButton;
   final bool useCheckButton;
   final bool useGridButton;
-  final OnBuildBody? onBuildBody;
+  final OnBuildBody onBuildBody;
   final OnRefereshForm? onRefreshForm;
 
   const JSONSelectField({
-    Key? key,
+    super.key,
     required this.schema,
     required this.useRadioButton,
     required this.useDropdownButton,
     required this.useCheckButton,
     required this.useGridButton,
+    required this.onBuildBody,
     this.onRefreshForm,
-    this.onBuildBody,
     this.onSaved,
-  }) : super(key: key);
+  });
 
   List<AstorItem> _selectedValues() {
     return schema.choices.whereType<AstorItem>().toList();
@@ -92,7 +92,8 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
   }
 
   TextStyle _titleStyle(BuildContext context) {
-    return Theme.of(context).textTheme.subtitle1?.copyWith(fontSize: 18) ??
+    // subtitle1 ya no existe en M3 -> usamos titleMedium
+    return Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18) ??
         const TextStyle(fontSize: 18);
   }
 
@@ -218,17 +219,22 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
                         padding: MaterialStateProperty.all<EdgeInsets>(
                           const EdgeInsets.all(0),
                         ),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(0.0),
                             side: const BorderSide(color: Colors.blue),
                           ),
                         ),
                         backgroundColor: MaterialStateProperty.all(
-                          selectedValue == choice ? Colors.blue : Colors.white,
+                          selectedValue == choice
+                              ? Colors.blue
+                              : Colors.white,
                         ),
                         foregroundColor: MaterialStateProperty.all(
-                          selectedValue == choice ? Colors.white : Colors.blue,
+                          selectedValue == choice
+                              ? Colors.white
+                              : Colors.blue,
                         ),
                       ),
                       child: Text(
@@ -403,7 +409,9 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
                                 selectValues.remove(choice);
                               }
 
-                              onSaved?.call(List<AstorItem>.from(selectValues));
+                              onSaved?.call(
+                                List<AstorItem>.from(selectValues),
+                              );
                               if (schema.refreshForm) {
                                 onRefreshForm?.call(schema, context);
                               }
@@ -458,13 +466,14 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
               onTap: schema.items.isEmpty
                   ? null
                   : () {
-                      FocusScope.of(context).requestFocus(FocusNode());
+                      FocusScope.of(context)
+                          .requestFocus(FocusNode());
                       showDialog(
                         context: context,
                         builder: (context) => buildSelectionPage(context),
                       );
                     },
-              title: Text('${schema.label}'),
+              title: Text(schema.label),
               subtitle: Text(getDescripcion()),
             ),
           ),
@@ -485,21 +494,37 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
   SelectionPage buildSelectionPage(BuildContext context) {
     final AstorProvider provider =
         Provider.of<AstorProvider>(context, listen: false);
+
+    // winLovOpen: Future<List<AstorItem>?>? Function(AstorCombo, String)
+    // lo adaptamos al typedef OnSearch esperado por SelectionPage
     return SelectionPage(
-      schema: schema,
-      onSearch: provider.winLovOpen,
-      multiple: schema.multiple,
-      useDialog: true,
-      onSelected: (value) {
-        onSaved?.call(value);
-        if (schema.refreshForm) {
-          onRefreshForm?.call(schema, context);
-        }
-      },
-      title: '${schema.label}',
-      selections: schema.items,
-      value: _selectedValues(),
-    );
+  schema: schema,
+  onSearch: (combo, text) async {
+    final future = provider.winLovOpen(combo, text);
+
+    // future puede ser null -> devolvemos lista vacía
+    if (future == null) {
+      return <AstorItem>[];
+    }
+
+    final result = await future;
+
+    // result puede ser null -> también devolvemos lista vacía
+    return result ?? <AstorItem>[];
+  },
+  multiple: schema.multiple,
+  useDialog: true,
+  onSelected: (value) {
+    onSaved?.call(value);
+    if (schema.refreshForm) {
+      onRefreshForm?.call(schema, context);
+    }
+  },
+  title: schema.label,
+  selections: schema.items,
+  value: _selectedValues(),
+);
+
   }
 
   @override

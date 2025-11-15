@@ -1,4 +1,3 @@
-
 import 'package:astor_mobile/json_textform/models/components/AvaliableWidgetTypes.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
@@ -16,62 +15,74 @@ class JSONDropDownButton extends StatelessWidget {
   final bool everyVisible;
 
   const JSONDropDownButton({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     this.everyVisible = false,
-  }) : super(key: key);
+  });
 
-  PopupMenuItem<AstorComponente> _buildTiles(AstorComponente root, BuildContext context) {
+  PopupMenuItem<AstorComponente> _buildTiles(
+    AstorComponente root,
+    BuildContext context,
+  ) {
     AstorComponente rootButton;
     if (root.widget == WidgetType.li) {
       rootButton = root.components.first;
     } else {
       rootButton = root;
     }
-    String label = rootButton.label;
-    String action = root.name.substring(root.name.lastIndexOf("-") + 1);
+    final String label = rootButton.label;
+    final String action = root.name.substring(root.name.lastIndexOf('-') + 1);
 
-    bool? visible = everyVisible
-        ? true
-        : Provider.of<AstorProvider>(context, listen: false)
-            .astorApp
-            .getObjAction(action);
+    final astorProvider = Provider.of<AstorProvider>(context, listen: false);
+    final astorApp = astorProvider.astorApp;
 
-    PopupMenuItem<AstorComponente> popup = PopupMenuItem(
-      child: Text(label),
+    bool? visible;
+
+    if (everyVisible) {
+      visible = true;
+    } else if (astorApp != null) {
+      visible = astorApp.getObjAction(action);
+    } else {
+      // si no hay astorApp, asumimos visible por defecto
+      visible = true;
+    }
+
+    final popup = PopupMenuItem<AstorComponente>(
       value: rootButton,
       enabled: visible ?? true,
+      child: Text(label),
     );
 
-    if (visible == null && !everyVisible) {
-      Provider.of<AstorProvider>(context, listen: false)
-          .astorApp
-          .addObjAction(action, false);
+    if (!everyVisible && astorApp != null && visible == null) {
+      astorApp.addObjAction(action, false);
     }
+
     return popup;
   }
 
   @override
   Widget build(BuildContext context) {
-    var items = schema.components
-        .where((element) =>
-            (element.widget == WidgetType.li || element.widget == WidgetType.button))
+    final items = schema.components
+        .where(
+          (element) =>
+              element.widget == WidgetType.li ||
+              element.widget == WidgetType.button,
+        )
         .toList();
-    return items.isEmpty
-        ? const SizedBox.shrink()
-        : PopupMenuButton<AstorComponente>(
-            itemBuilder: (BuildContext bc) => [
-              for (var option in items) _buildTiles(option, context)
-            ],
-            onSelected: (route) {
-              onPressed(route, context);
-            },
-          );
+
+    if (items.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return PopupMenuButton<AstorComponente>(
+      itemBuilder: (BuildContext bc) => [
+        for (final option in items) _buildTiles(option, context),
+      ],
+      onSelected: (route) {
+        onPressed(route, context);
+      },
+    );
   }
-
-
-
 }
-

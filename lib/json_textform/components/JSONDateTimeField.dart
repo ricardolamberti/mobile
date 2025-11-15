@@ -7,10 +7,10 @@ class JSONDateTimeField extends StatefulWidget {
   final ValueChanged<String>? onSaved;
 
   const JSONDateTimeField({
-    Key? key,
+    super.key,
     required this.schema,
     this.onSaved,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -129,18 +129,16 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
   Widget addReadonly(bool visible, String format) {
     return Visibility(
       visible: visible,
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-          child: TextFormField(
-            key: Key('textfield-${widget.schema.name}'),
-            maxLines: 1,
-            enabled: false,
-            initialValue: widget.schema.value?.toString() ?? '',
-            decoration: InputDecoration(
-              filled: false,
-              labelText: widget.schema.label,
-            ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+        child: TextFormField(
+          key: Key('textfield-${widget.schema.name}'),
+          maxLines: 1,
+          enabled: false,
+          initialValue: widget.schema.value?.toString() ?? '',
+          decoration: InputDecoration(
+            filled: false,
+            labelText: widget.schema.label,
           ),
         ),
       ),
@@ -172,6 +170,7 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
                 initialTime: time ?? TimeOfDay.now(),
               );
             }
+            if (!mounted) return;
             if (selectedDate != null && selectedTime != null) {
               final DateTime confirmedDate = selectedDate;
               final TimeOfDay confirmedTime = selectedTime;
@@ -194,9 +193,7 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
           decoration: InputDecoration(
             filled: false,
             labelText: widget.schema.label,
-            prefixIcon: widget.schema.icon != null
-                ? Icon(widget.schema.icon.iconData)
-                : null,
+            prefixIcon: _buildPrefixIcon(),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(5.0),
@@ -233,78 +230,75 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
     }
     return Visibility(
       visible: visible,
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-          child: TextFormField(
-            onTap: () async {
-              if (bugSuffixOpen) return;
-              final DateTime? selectedDateFrom = await showDatePicker(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+        child: TextFormField(
+          onTap: () async {
+            if (bugSuffixOpen) return;
+            final DateTime? selectedDateFrom = await showDatePicker(
+              context: context,
+              initialDate: dateTimeFrom ?? DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2077),
+            );
+            DateTime? selectedDateTo;
+            if (selectedDateFrom != null) {
+              final DateTime? currentTo = dateTimeTo;
+              final DateTime initialEndDate =
+                  currentTo == null || currentTo.isBefore(selectedDateFrom)
+                      ? selectedDateFrom
+                      : currentTo;
+              selectedDateTo = await showDatePicker(
                 context: context,
-                initialDate: dateTimeFrom ?? DateTime.now(),
-                firstDate: DateTime(1900),
+                initialDate: initialEndDate,
+                firstDate: selectedDateFrom,
                 lastDate: DateTime(2077),
               );
-              DateTime? selectedDateTo;
-              if (selectedDateFrom != null) {
-                final DateTime? currentTo = dateTimeTo;
-                final DateTime initialEndDate =
-                    currentTo == null || currentTo.isBefore(selectedDateFrom)
-                        ? selectedDateFrom
-                        : currentTo;
-                selectedDateTo = await showDatePicker(
-                  context: context,
-                  initialDate: initialEndDate,
-                  firstDate: selectedDateFrom,
-                  lastDate: DateTime(2077),
-                );
-              }
-              if (selectedDateFrom != null && selectedDateTo != null) {
-                final DateTime confirmedFrom = selectedDateFrom;
-                final DateTime confirmedTo = selectedDateTo;
-                setState(() {
-                  dateTimeFrom = confirmedFrom;
-                  dateTimeTo = confirmedTo;
-                  controller.text =
-                      '${DateFormat(format).format(confirmedFrom)} - ${DateFormat(format).format(confirmedTo)}';
-                });
-              }
-            },
-            enabled: true,
-            key: const Key('intervaldatetimefield'),
-            controller: controller,
-            decoration: InputDecoration(
-              filled: false,
-              labelText: widget.schema.label,
-              prefixIcon: widget.schema.icon != null
-                  ? Icon(widget.schema.icon.iconData)
-                  : null,
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(5.0),
-                ),
-              ),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  bugSuffixOpen = true;
-                  clear();
-                  Future.delayed(const Duration(milliseconds: 100), () {
-                    bugSuffixOpen = false;
-                  });
-                },
-                icon: const Icon(Icons.clear),
+            }
+            if (!mounted) return;
+            if (selectedDateFrom != null && selectedDateTo != null) {
+              final DateTime confirmedFrom = selectedDateFrom;
+              final DateTime confirmedTo = selectedDateTo;
+              setState(() {
+                dateTimeFrom = confirmedFrom;
+                dateTimeTo = confirmedTo;
+                controller.text =
+                    '${DateFormat(format).format(confirmedFrom)} - ${DateFormat(format).format(confirmedTo)}';
+              });
+            }
+          },
+          enabled: true,
+          key: const Key('intervaldatetimefield'),
+          controller: controller,
+          decoration: InputDecoration(
+            filled: false,
+            labelText: widget.schema.label,
+            prefixIcon: _buildPrefixIcon(),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
               ),
             ),
-            onSaved: (v) {
-              final DateTime? from = dateTimeFrom;
-              final DateTime? to = dateTimeTo;
-              widget.onSaved?.call(
-                from == null || to == null
-                    ? ''
-                    : '${DateFormat(format).format(from)} - ${DateFormat(format).format(to)}',
-              );
-            },
+            suffixIcon: IconButton(
+              onPressed: () {
+                bugSuffixOpen = true;
+                clear();
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  bugSuffixOpen = false;
+                });
+              },
+              icon: const Icon(Icons.clear),
+            ),
           ),
+          onSaved: (v) {
+            final DateTime? from = dateTimeFrom;
+            final DateTime? to = dateTimeTo;
+            widget.onSaved?.call(
+              from == null || to == null
+                  ? ''
+                  : '${DateFormat(format).format(from)} - ${DateFormat(format).format(to)}',
+            );
+          },
         ),
       ),
     );
@@ -323,59 +317,56 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
     }
     return Visibility(
       visible: visible,
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-          child: TextFormField(
-            onTap: () async {
-              if (bugSuffixOpen) return;
-              final DateTime? selectedDate = await showDatePicker(
-                context: context,
-                initialDate: dateTime ?? DateTime.now(),
-                firstDate: DateTime(1900),
-                lastDate: DateTime(2077),
-              );
-              if (selectedDate != null) {
-                setState(() {
-                  dateTime = selectedDate;
-                  controller.text = DateFormat(format).format(selectedDate);
-                });
-              }
-            },
-            enabled: true,
-            key: const Key('datetimefield'),
-            controller: controller,
-            decoration: InputDecoration(
-              filled: false,
-              labelText: widget.schema.label,
-              prefixIcon: widget.schema.icon != null
-                  ? Icon(widget.schema.icon.iconData)
-                  : null,
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(5.0),
-                ),
-              ),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  bugSuffixOpen = true;
-                  clear();
-                  Future.delayed(const Duration(milliseconds: 100), () {
-                    bugSuffixOpen = false;
-                  });
-                },
-                icon: const Icon(Icons.clear),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+        child: TextFormField(
+          onTap: () async {
+            if (bugSuffixOpen) return;
+            final DateTime? selectedDate = await showDatePicker(
+              context: context,
+              initialDate: dateTime ?? DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2077),
+            );
+            if (!mounted) return;
+            if (selectedDate != null) {
+              setState(() {
+                dateTime = selectedDate;
+                controller.text = DateFormat(format).format(selectedDate);
+              });
+            }
+          },
+          enabled: true,
+          key: const Key('datetimefield'),
+          controller: controller,
+          decoration: InputDecoration(
+            filled: false,
+            labelText: widget.schema.label,
+            prefixIcon: _buildPrefixIcon(),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
               ),
             ),
-            onSaved: (v) {
-              final DateTime? currentDate = dateTime;
-              widget.onSaved?.call(
-                currentDate == null
-                    ? ''
-                    : DateFormat(format).format(currentDate),
-              );
-            },
+            suffixIcon: IconButton(
+              onPressed: () {
+                bugSuffixOpen = true;
+                clear();
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  bugSuffixOpen = false;
+                });
+              },
+              icon: const Icon(Icons.clear),
+            ),
           ),
+          onSaved: (v) {
+            final DateTime? currentDate = dateTime;
+            widget.onSaved?.call(
+              currentDate == null
+                  ? ''
+                  : DateFormat(format).format(currentDate),
+            );
+          },
         ),
       ),
     );
@@ -388,58 +379,66 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
     }
     return Visibility(
       visible: visible,
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-          child: TextFormField(
-            onTap: () async {
-              if (bugSuffixOpen) return;
-              final TimeOfDay? selectedTime = await showTimePicker(
-                context: context,
-                initialTime: time ?? TimeOfDay.now(),
-              );
-              if (selectedTime != null) {
-                setState(() {
-                  time = selectedTime;
-                  controller.text = _timeToString(selectedTime);
-                });
-              }
-            },
-            enabled: true,
-            key: const Key('datetimefield'),
-            controller: controller,
-            decoration: InputDecoration(
-              filled: false,
-              labelText: widget.schema.label,
-              prefixIcon: widget.schema.icon != null
-                  ? Icon(widget.schema.icon.iconData)
-                  : null,
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(5.0),
-                ),
-              ),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  bugSuffixOpen = true;
-                  clear();
-                  Future.delayed(const Duration(milliseconds: 100), () {
-                    bugSuffixOpen = false;
-                  });
-                },
-                icon: const Icon(Icons.clear),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+        child: TextFormField(
+          onTap: () async {
+            if (bugSuffixOpen) return;
+            final TimeOfDay? selectedTime = await showTimePicker(
+              context: context,
+              initialTime: time ?? TimeOfDay.now(),
+            );
+            if (!mounted) return;
+            if (selectedTime != null) {
+              setState(() {
+                time = selectedTime;
+                controller.text = _timeToString(selectedTime);
+              });
+            }
+          },
+          enabled: true,
+          key: const Key('datetimefield'),
+          controller: controller,
+          decoration: InputDecoration(
+            filled: false,
+            labelText: widget.schema.label,
+            prefixIcon: _buildPrefixIcon(),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
               ),
             ),
-            onSaved: (v) {
-              final TimeOfDay? currentTime = time;
-              widget.onSaved?.call(
-                currentTime == null ? '' : '${_timeToString(currentTime)}:00',
-              );
-            },
+            suffixIcon: IconButton(
+              onPressed: () {
+                bugSuffixOpen = true;
+                clear();
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  bugSuffixOpen = false;
+                });
+              },
+              icon: const Icon(Icons.clear),
+            ),
           ),
+          onSaved: (v) {
+            final TimeOfDay? currentTime = time;
+            widget.onSaved?.call(
+              currentTime == null ? '' : '${_timeToString(currentTime)}:00',
+            );
+          },
         ),
       ),
     );
+  }
+
+  /// Manejo seguro del icono (por tema de promoción de null en fields públicos)
+  Widget? _buildPrefixIcon() {
+    final iconWrapper = widget.schema.icon;
+    if (iconWrapper == null) return null;
+
+    final iconData = iconWrapper.iconData;
+    if (iconData == null) return null;
+
+    return Icon(iconData);
   }
 
   String _timeToString(TimeOfDay currentTime) {

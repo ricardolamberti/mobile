@@ -102,7 +102,7 @@ class JSONIcon extends StatelessWidget {
      addIcon("fiveHundredPx",FontAwesomeIcons.fiveHundredPx);
      addIcon("accessibleIcon",FontAwesomeIcons.accessibleIcon);
      addIcon("accusoft",FontAwesomeIcons.accusoft);
-     addIcon("acquisitionsIncorporated",FontAwesomeIcons.acquisitionsIncorporated);
+     addIcon("acquisitionsIncorporated",FontAwesomeIcons.bluesky);
      addIcon("ad",FontAwesomeIcons.ad);
      addIcon("addressBook",FontAwesomeIcons.addressBook);
      addIcon("solidAddressBook",FontAwesomeIcons.solidAddressBook);
@@ -1147,7 +1147,7 @@ class JSONIcon extends StatelessWidget {
      addIcon("penSquare",FontAwesomeIcons.penSquare);
      addIcon("pencilAlt",FontAwesomeIcons.pencilAlt);
      addIcon("pencilRuler",FontAwesomeIcons.pencilRuler);
-     addIcon("pennyArcade",FontAwesomeIcons.pennyArcade);
+     addIcon("pennyArcade",FontAwesomeIcons.pen);
      addIcon("peopleArrows",FontAwesomeIcons.peopleArrows);
      addIcon("peopleCarry",FontAwesomeIcons.peopleCarry);
      addIcon("pepperHot",FontAwesomeIcons.pepperHot);
@@ -1544,7 +1544,7 @@ class JSONIcon extends StatelessWidget {
      addIcon("trashRestoreAlt",FontAwesomeIcons.trashRestoreAlt);
      addIcon("tree",FontAwesomeIcons.tree);
      addIcon("trello",FontAwesomeIcons.trello);
-     addIcon("tripadvisor",FontAwesomeIcons.tripadvisor);
+     addIcon("tripadvisor",FontAwesomeIcons.airbnb);
      addIcon("trophy",FontAwesomeIcons.trophy);
      addIcon("truck",FontAwesomeIcons.truck);
      addIcon("truckLoading",FontAwesomeIcons.truckLoading);
@@ -1616,7 +1616,7 @@ class JSONIcon extends StatelessWidget {
      addIcon("utensilSpoon",FontAwesomeIcons.utensilSpoon);
      addIcon("utensils",FontAwesomeIcons.utensils);
      addIcon("vaadin",FontAwesomeIcons.vaadin);
-     addIcon("vectorSquare",FontAwesomeIcons.vectorSquare);
+     addIcon("vectorSquare",FontAwesomeIcons.square);
      addIcon("venus",FontAwesomeIcons.venus);
      addIcon("venusDouble",FontAwesomeIcons.venusDouble);
      addIcon("venusMars",FontAwesomeIcons.venusMars);
