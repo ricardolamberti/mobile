@@ -6,10 +6,10 @@ class FileFieldValue {
   bool willClear;
 
   /// Only not null when user pick a local file
-  File _file;
+  File? _file;
 
   /// Web path
-  String path;
+  String? path;
 
   /// When file is set, this field will be true;
   bool hasUpdated;
@@ -19,11 +19,11 @@ class FileFieldValue {
       return true;
     }
 
-    return path.isEmpty;
+    return path?.isEmpty ?? false;
   }
 
   /// Return [file] if file field has been set, otherwise return null;
-  File get value {
+  File? get value {
     if (willClear && _file == null) {
       return null;
     }
@@ -35,33 +35,33 @@ class FileFieldValue {
     return _file;
   }
 
-  File get file => this._file;
+  File? get file => _file;
 
-  set file(File file) {
-    this._file = file;
+  set file(File? file) {
+    _file = file;
     if (file != null) {
-      this.willClear = false;
-      this.hasUpdated = true;
+      willClear = false;
+      hasUpdated = true;
     }
   }
 
   void restoreOld() {
-    this.willClear = false;
+    willClear = false;
     if (_file == null) {
-      this.hasUpdated = false;
+      hasUpdated = false;
     }
   }
 
   void clearOld() {
-    this.hasUpdated = true;
-    this.willClear = true;
+    hasUpdated = true;
+    willClear = true;
   }
 
   void clearNew() {
-    this._file = null;
-    if (this.path != null) {
+    _file = null;
+    if (path != null) {
       if (!willClear) {
-        this.hasUpdated = false;
+        hasUpdated = false;
       }
     }
   }
@@ -73,9 +73,9 @@ class FileFieldValue {
   @override
   String toString() {
     if (!hasUpdated) {
-      return path;
+      return path ?? "";
     } else if (hasUpdated) {
-      return _file?.path ?? path;
+      return _file?.path ?? path ?? "";
     } else {
       return "";
     }
