@@ -5,39 +5,41 @@ import 'package:flutter/material.dart';
 
 import '../JSONForm.dart';
 
-typedef void OnChange(bool value);
+typedef OnChange = void Function(bool value);
 
 class JSONCheckboxField extends StatelessWidget {
   final AstorComponente schema;
-  final OnChange onSaved;
+  final OnChange? onSaved;
   final bool showIcon;
   final bool visible;
   final bool edited;
-  final OnRefereshForm onRefreshForm;
+  final OnRefereshForm? onRefreshForm;
 
-JSONCheckboxField({
-    @required this.schema,
+  const JSONCheckboxField({
+    Key? key,
+    required this.schema,
     this.onSaved,
     this.showIcon = true,
-    this.onRefreshForm=null,
-    @required this.visible,
-    @required this.edited,
-  });
+    this.onRefreshForm,
+    required this.visible,
+    required this.edited,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    bool visible = schema.visible;
-    bool edited = schema.edited;
-    String mode = schema.mode;
+    final bool visible = schema.visible;
+    final bool edited = schema.edited;
+    final String mode = schema.mode;
     if (mode=='toggle')
       return Visibility(
         visible: visible,
         child: SwitchListTile(
             value: schema.valueChecked,
             onChanged: (v) {
-              onSaved(v);
+              final bool newValue = v;
+              onSaved?.call(newValue);
               if (schema.refreshForm) {
-                onRefreshForm(schema, context);
+                onRefreshForm?.call(schema, context);
               }
             },
             title: Text("${schema.label}"),
@@ -50,9 +52,10 @@ JSONCheckboxField({
       child: CheckboxListTile(
         value: schema.valueChecked,
         onChanged: (v) {
-          onSaved(v);
+          final bool newValue = v ?? false;
+          onSaved?.call(newValue);
           if (schema.refreshForm) {
-            onRefreshForm(schema, context);
+            onRefreshForm?.call(schema, context);
           }
         },
         title: Text("${schema.label}"),
