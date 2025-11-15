@@ -1,17 +1,15 @@
-
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-
 class JSONDateTimeField extends StatefulWidget {
   final AstorComponente schema;
-  final Function onSaved;
+  final ValueChanged<String>? onSaved;
 
-  JSONDateTimeField({
-    @required this.schema,
+  const JSONDateTimeField({
+    Key? key,
+    required this.schema,
     this.onSaved,
-    Key key,
   }) : super(key: key);
 
   @override
@@ -21,11 +19,12 @@ class JSONDateTimeField extends StatefulWidget {
 }
 
 class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
-  TextEditingController _controller;
-  DateTime dateTime;
-  DateTime dateTimeFrom;
-  DateTime dateTimeTo;
-  TimeOfDay time;
+  TextEditingController? _controller;
+  DateTime? dateTime;
+  DateTime? dateTimeFrom;
+  DateTime? dateTimeTo;
+  TimeOfDay? time;
+  bool bugSuffixOpen = false;
 
   @override
   void initState() {
@@ -39,338 +38,445 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
     init();
   }
 
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
   void init() {
-    String format = widget.schema.formatDate;
-    if (!isEdited()) return;
-    if (getDateType()=="JHOUR" ) {
-      String value = widget.schema.value;
-      dateTime = value==""?DateTime.now():DateFormat(format).parse(value);
-      time = value==""?null:TimeOfDay.fromDateTime(dateTime);
-      _controller = TextEditingController(
-          text: value==""?"":"${time.hour}:${time.minute}");
-      _controller.addListener(() {
-        _controller.text = time==null?"":"${time.hour}:${time.minute}";
+    _controller?.dispose();
+    _controller = null;
+
+    final String format = widget.schema.formatDate;
+    if (!isEdited()) {
+      return;
+    }
+
+    final String value = widget.schema.value?.toString() ?? '';
+    final String dateType = getDateType();
+
+    if (dateType == 'JHOUR') {
+      final DateTime parsedDate =
+          value.isEmpty ? DateTime.now() : DateFormat(format).parse(value);
+      final TimeOfDay? initialTime =
+          value.isEmpty ? null : TimeOfDay.fromDateTime(parsedDate);
+      dateTime = parsedDate;
+      time = initialTime;
+      final controller = TextEditingController(
+        text: initialTime == null ? '' : _timeToString(initialTime),
+      );
+      controller.addListener(() {
+        final TimeOfDay? currentTime = time;
+        controller.text = currentTime == null ? '' : _timeToString(currentTime);
       });
-    } else if (getDateType()=="JDATETIME" ) {
-      String value = widget.schema.value;
-      dateTime = value==""?null:DateFormat(format).parse(value);
-      time = value==""?"":TimeOfDay.fromDateTime(dateTime);
-      _controller = TextEditingController(text: value);
-      _controller.addListener(() {_controller.text = dateTime==null?"":DateFormat(format).format(dateTime);});
-    } else if (getDateType()=="JINTERVALDATE" ) {
-      if (widget.schema.value=="") {
-        _controller = TextEditingController(text: "");
-      } else {
-        List<String> values = widget.schema.value.toString().split(" - ");
-        if (values.length!=2||(values.length==2&&(values[0]==""||values[1]==""))) {
-          _controller = TextEditingController(text: "");
+      _controller = controller;
+      return;
+    }
+
+    if (dateType == 'JDATETIME') {
+      final DateTime? parsedDate =
+          value.isEmpty ? null : DateFormat(format).parse(value);
+      dateTime = parsedDate;
+      time = parsedDate == null ? null : TimeOfDay.fromDateTime(parsedDate);
+      final controller = TextEditingController(text: value);
+      controller.addListener(() {
+        final DateTime? currentDate = dateTime;
+        controller.text = currentDate == null
+            ? ''
+            : DateFormat(format).format(currentDate);
+      });
+      _controller = controller;
+      return;
+    }
+
+    if (dateType == 'JINTERVALDATE') {
+      final controller = TextEditingController(text: '');
+      if (value.isNotEmpty) {
+        final List<String> values = value.split(' - ');
+        if (values.length != 2 || values[0].isEmpty || values[1].isEmpty) {
+          _controller = controller;
           return;
         }
-        dateTimeFrom= DateFormat(format).parse(values[0]);
-        dateTimeTo= DateFormat(format).parse(values[1]);
-        _controller = TextEditingController(text: widget.schema.value);
-
+        dateTimeFrom = DateFormat(format).parse(values[0]);
+        dateTimeTo = DateFormat(format).parse(values[1]);
+        controller.text = value;
       }
-   _controller.addListener(() {_controller.text = dateTimeFrom==null?"":DateFormat(format).format(dateTimeFrom)+" - "+DateFormat(format).format(dateTimeTo);});
-    }else {
-      String value = widget.schema.value;
-      dateTime = value==""?null:DateFormat(format).parse(value);
-      _controller = TextEditingController(text: value);
-      _controller.addListener(() {_controller.text = dateTime==null?"":DateFormat(format).format(dateTime);});
+      controller.addListener(() {
+        final DateTime? from = dateTimeFrom;
+        final DateTime? to = dateTimeTo;
+        controller.text = from == null || to == null
+            ? ''
+            : '${DateFormat(format).format(from)} - ${DateFormat(format).format(to)}';
+      });
+      _controller = controller;
+      return;
+    }
 
-      }
-
+    final DateTime? parsedDate =
+        value.isEmpty ? null : DateFormat(format).parse(value);
+    dateTime = parsedDate;
+    final controller = TextEditingController(text: value);
+    controller.addListener(() {
+      final DateTime? currentDate = dateTime;
+      controller.text = currentDate == null
+          ? ''
+          : DateFormat(format).format(currentDate);
+    });
+    _controller = controller;
   }
-  Widget addReadonly(bool visible,String format) {
-    return Visibility(
-        visible: visible,
-        child: Container(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-            child: TextFormField(
-              key: Key("textfield-${widget.schema.name}"),
-              maxLines: 1,
-              enabled: false,
-              initialValue: widget.schema.value,
-              decoration: InputDecoration(
-                filled: false,
-                labelText: widget.schema.label,
-              ),
 
-            ),
-          ),
-        )
-    );
-  }
-  bool bugSuffixOpen=false;
-  Widget addDateTimePicker(bool visible,String format) {
+  Widget addReadonly(bool visible, String format) {
     return Visibility(
-        visible: visible,
+      visible: visible,
+      child: Container(
         child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-            child: TextFormField(
-              onTap: () async {
-                if (bugSuffixOpen==true) return;
-                DateTime selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate:  dateTime==null?DateTime.now():dateTime,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2077),
-                );
-                TimeOfDay selectedTime=null;
-                if (selectedDate!=null) {
-                    selectedTime = await showTimePicker(
-                    context: context,
-                    initialTime: time==null?TimeOfDay.now():time,
-                  );
-                }
-                if (selectedTime != null) {
-                  setState(() {
-                    selectedDate=selectedDate.add(Duration(hours:selectedTime.hour,minutes:selectedTime.minute));
-                    dateTime = selectedDate;
-                    time = TimeOfDay.fromDateTime(dateTime);
-                    _controller.text =  DateFormat(format).format(selectedDate);
-                  });
-                }
-              },
-              enabled: true,
-              key: Key("datetimefield"),
-              controller: _controller,
-              decoration: InputDecoration(
-                filled: false,
-               // helperText: widget.schema.help,
-                labelText: widget.schema.label,
-                prefixIcon: widget.schema.icon != null
-                    ? Icon(widget.schema.icon.iconData)
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: const BorderRadius.all(
-                    const Radius.circular(5.0),
-                  ),
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    bugSuffixOpen=true;
-                    clear();
-                    Future.delayed(Duration(milliseconds: 100), () { bugSuffixOpen = false; });
-                  },
-                  icon: Icon(Icons.clear),
-                ),
-              ),
-              onSaved: (v) {
-                this.widget.onSaved(dateTime==null?"":DateFormat(format).format(dateTime));
-              },
-            ),
-
-        )
-    );
-  }
-  Widget addIntervalDatePicker(bool visible,String format) {
-    return Visibility(
-        visible: visible,
-        child:  Container(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-            child: TextFormField(
-              onTap: () async {
-                if (bugSuffixOpen==true) return;
-                DateTime selectedDateFrom = await showDatePicker(
-                  context: context,
-                  initialDate:  dateTimeFrom==null?DateTime.now():dateTimeFrom,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2077),
-                );
-                DateTime selectedDateTo=null;
-                if (selectedDateFrom!=null) {
-                  selectedDateTo = await showDatePicker(
-                    context: context,
-                    initialDate: dateTimeTo==null||dateTimeTo.isBefore(selectedDateFrom)?selectedDateFrom:dateTimeTo,
-                    firstDate: selectedDateFrom,
-                    lastDate: DateTime(2077),
-                  );
-                }
-                if (selectedDateTo != null) {
-                  setState(() {
-                    dateTimeFrom=selectedDateFrom;
-                    dateTimeTo=selectedDateTo;
-                    _controller.text =  DateFormat(format).format(selectedDateFrom)+" - "+DateFormat(format).format(selectedDateTo);
-                  });
-                }
-              },
-              enabled: true,
-              key: Key("intervaldatetimefield"),
-              controller: _controller,
-              decoration: InputDecoration(
-                filled: false,
-                // helperText: widget.schema.help,
-                labelText: widget.schema.label,
-                prefixIcon: widget.schema.icon != null
-                    ? Icon(widget.schema.icon.iconData)
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: const BorderRadius.all(
-                    const Radius.circular(5.0),
-                  ),
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    bugSuffixOpen=true;
-                    clear();
-                    Future.delayed(Duration(milliseconds: 100), () { bugSuffixOpen = false; });
-                  },
-                  icon: Icon(Icons.clear),
-                ),
-              ),
-              onSaved: (v) {
-                this.widget.onSaved(dateTimeFrom==null?"":DateFormat(format).format(dateTimeFrom)+" - "+DateFormat(format).format(dateTimeTo));
-              },
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+          child: TextFormField(
+            key: Key('textfield-${widget.schema.name}'),
+            maxLines: 1,
+            enabled: false,
+            initialValue: widget.schema.value?.toString() ?? '',
+            decoration: InputDecoration(
+              filled: false,
+              labelText: widget.schema.label,
             ),
           ),
-        )
+        ),
+      ),
     );
   }
+
+  Widget addDateTimePicker(bool visible, String format) {
+    final controller = _controller;
+    if (controller == null) {
+      return const SizedBox.shrink();
+    }
+    return Visibility(
+      visible: visible,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+        child: TextFormField(
+          onTap: () async {
+            if (bugSuffixOpen) return;
+            final DateTime? selectedDate = await showDatePicker(
+              context: context,
+              initialDate: dateTime ?? DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2077),
+            );
+            TimeOfDay? selectedTime;
+            if (selectedDate != null) {
+              selectedTime = await showTimePicker(
+                context: context,
+                initialTime: time ?? TimeOfDay.now(),
+              );
+            }
+            if (selectedDate != null && selectedTime != null) {
+              final DateTime confirmedDate = selectedDate;
+              final TimeOfDay confirmedTime = selectedTime;
+              setState(() {
+                final DateTime combinedDate = confirmedDate.add(
+                  Duration(
+                    hours: confirmedTime.hour,
+                    minutes: confirmedTime.minute,
+                  ),
+                );
+                dateTime = combinedDate;
+                time = TimeOfDay.fromDateTime(combinedDate);
+                controller.text = DateFormat(format).format(combinedDate);
+              });
+            }
+          },
+          enabled: true,
+          key: const Key('datetimefield'),
+          controller: controller,
+          decoration: InputDecoration(
+            filled: false,
+            labelText: widget.schema.label,
+            prefixIcon: widget.schema.icon != null
+                ? Icon(widget.schema.icon.iconData)
+                : null,
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
+            suffixIcon: IconButton(
+              onPressed: () {
+                bugSuffixOpen = true;
+                clear();
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  bugSuffixOpen = false;
+                });
+              },
+              icon: const Icon(Icons.clear),
+            ),
+          ),
+          onSaved: (v) {
+            final DateTime? currentDate = dateTime;
+            widget.onSaved?.call(
+              currentDate == null
+                  ? ''
+                  : DateFormat(format).format(currentDate),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget addIntervalDatePicker(bool visible, String format) {
+    final controller = _controller;
+    if (controller == null) {
+      return const SizedBox.shrink();
+    }
+    return Visibility(
+      visible: visible,
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+          child: TextFormField(
+            onTap: () async {
+              if (bugSuffixOpen) return;
+              final DateTime? selectedDateFrom = await showDatePicker(
+                context: context,
+                initialDate: dateTimeFrom ?? DateTime.now(),
+                firstDate: DateTime(1900),
+                lastDate: DateTime(2077),
+              );
+              DateTime? selectedDateTo;
+              if (selectedDateFrom != null) {
+                final DateTime? currentTo = dateTimeTo;
+                final DateTime initialEndDate =
+                    currentTo == null || currentTo.isBefore(selectedDateFrom)
+                        ? selectedDateFrom
+                        : currentTo;
+                selectedDateTo = await showDatePicker(
+                  context: context,
+                  initialDate: initialEndDate,
+                  firstDate: selectedDateFrom,
+                  lastDate: DateTime(2077),
+                );
+              }
+              if (selectedDateFrom != null && selectedDateTo != null) {
+                final DateTime confirmedFrom = selectedDateFrom;
+                final DateTime confirmedTo = selectedDateTo;
+                setState(() {
+                  dateTimeFrom = confirmedFrom;
+                  dateTimeTo = confirmedTo;
+                  controller.text =
+                      '${DateFormat(format).format(confirmedFrom)} - ${DateFormat(format).format(confirmedTo)}';
+                });
+              }
+            },
+            enabled: true,
+            key: const Key('intervaldatetimefield'),
+            controller: controller,
+            decoration: InputDecoration(
+              filled: false,
+              labelText: widget.schema.label,
+              prefixIcon: widget.schema.icon != null
+                  ? Icon(widget.schema.icon.iconData)
+                  : null,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(5.0),
+                ),
+              ),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  bugSuffixOpen = true;
+                  clear();
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    bugSuffixOpen = false;
+                  });
+                },
+                icon: const Icon(Icons.clear),
+              ),
+            ),
+            onSaved: (v) {
+              final DateTime? from = dateTimeFrom;
+              final DateTime? to = dateTimeTo;
+              widget.onSaved?.call(
+                from == null || to == null
+                    ? ''
+                    : '${DateFormat(format).format(from)} - ${DateFormat(format).format(to)}',
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   void clear() {
-    dateTime =null;
-    time=null;
-    _controller.clear();
+    dateTime = null;
+    time = null;
+    _controller?.clear();
   }
-  Widget addDatePicker(bool visible,String format) {
-    return Visibility(
-        visible: visible,
-        child:  Container(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-            child: TextFormField(
-              onTap: () async {
-                if (bugSuffixOpen==true) return;
-                DateTime selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: dateTime==null?DateTime.now():dateTime,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2077),
-                );
-                if (selectedDate!=null) {
-                  setState(() {
-                    dateTime = selectedDate;
-                    _controller.text = DateFormat(format).format(selectedDate);
-                  });
-                }
-              },
-              enabled: true,
-              key: Key("datetimefield"),
-              controller: _controller,
-              decoration: InputDecoration(
-                filled: false,
-                // helperText: widget.schema.help,
-                labelText: widget.schema.label,
-                prefixIcon: widget.schema.icon != null
-                    ? Icon(widget.schema.icon.iconData)
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: const BorderRadius.all(
-                    const Radius.circular(5.0),
-                  ),
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    bugSuffixOpen=true;
-                    clear();
-                    Future.delayed(Duration(milliseconds: 100), () { bugSuffixOpen = false; });
-                  },
-                  icon: Icon(Icons.clear),
-                ),
 
-              ),
-              onSaved: (v) {
-                this.widget.onSaved(dateTime==null?"":DateFormat(format).format(dateTime));
-              },
-            ),
-          ),
-        )
-    );
-  }
-    Widget addTimePicker(bool visible,String format) {
+  Widget addDatePicker(bool visible, String format) {
+    final controller = _controller;
+    if (controller == null) {
+      return const SizedBox.shrink();
+    }
     return Visibility(
-        visible: visible,
-        child:  Container(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-            child: TextFormField(
-              onTap: () async {
-                if (bugSuffixOpen==true) return;
-                TimeOfDay selectedTime = await showTimePicker(
-                  context: context,
-                  initialTime: time==null?TimeOfDay.now():time,
-                );
-                if (selectedTime != null) {
-                  setState(() {
-                    time = selectedTime;
-                    _controller.text = time.hour.toString().padLeft(2, "0")+":"+time.minute.toString().padLeft(2, "0");
-                  });
-                }
-              },
-              enabled: true,
-              key: Key("datetimefield"),
-              controller: _controller,
-              decoration: InputDecoration(
-                filled: false,
-                // helperText: widget.schema.help,
-                labelText: widget.schema.label,
-                prefixIcon: widget.schema.icon != null
-                    ? Icon(widget.schema.icon.iconData)
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: const BorderRadius.all(
-                    const Radius.circular(5.0),
-                  ),
-                ),
-                suffixIcon:  IconButton(
-                  onPressed: () {
-                    bugSuffixOpen=true;
-                    clear();
-                    Future.delayed(Duration(milliseconds: 100), () { bugSuffixOpen = false; });
-                  },
-                  icon: Icon(Icons.clear),
+      visible: visible,
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+          child: TextFormField(
+            onTap: () async {
+              if (bugSuffixOpen) return;
+              final DateTime? selectedDate = await showDatePicker(
+                context: context,
+                initialDate: dateTime ?? DateTime.now(),
+                firstDate: DateTime(1900),
+                lastDate: DateTime(2077),
+              );
+              if (selectedDate != null) {
+                setState(() {
+                  dateTime = selectedDate;
+                  controller.text = DateFormat(format).format(selectedDate);
+                });
+              }
+            },
+            enabled: true,
+            key: const Key('datetimefield'),
+            controller: controller,
+            decoration: InputDecoration(
+              filled: false,
+              labelText: widget.schema.label,
+              prefixIcon: widget.schema.icon != null
+                  ? Icon(widget.schema.icon.iconData)
+                  : null,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(5.0),
                 ),
               ),
-              onSaved: (v) {
-                this.widget.onSaved(time==null?"":time.hour.toString().padLeft(2, "0")+":"+time.minute.toString().padLeft(2, "0")+":00");
-              },
+              suffixIcon: IconButton(
+                onPressed: () {
+                  bugSuffixOpen = true;
+                  clear();
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    bugSuffixOpen = false;
+                  });
+                },
+                icon: const Icon(Icons.clear),
+              ),
             ),
+            onSaved: (v) {
+              final DateTime? currentDate = dateTime;
+              widget.onSaved?.call(
+                currentDate == null
+                    ? ''
+                    : DateFormat(format).format(currentDate),
+              );
+            },
           ),
-        )
+        ),
+      ),
     );
   }
-  String getOptions() {
-    return widget.schema.dateOptions;
+
+  Widget addTimePicker(bool visible, String format) {
+    final controller = _controller;
+    if (controller == null) {
+      return const SizedBox.shrink();
+    }
+    return Visibility(
+      visible: visible,
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+          child: TextFormField(
+            onTap: () async {
+              if (bugSuffixOpen) return;
+              final TimeOfDay? selectedTime = await showTimePicker(
+                context: context,
+                initialTime: time ?? TimeOfDay.now(),
+              );
+              if (selectedTime != null) {
+                setState(() {
+                  time = selectedTime;
+                  controller.text = _timeToString(selectedTime);
+                });
+              }
+            },
+            enabled: true,
+            key: const Key('datetimefield'),
+            controller: controller,
+            decoration: InputDecoration(
+              filled: false,
+              labelText: widget.schema.label,
+              prefixIcon: widget.schema.icon != null
+                  ? Icon(widget.schema.icon.iconData)
+                  : null,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(5.0),
+                ),
+              ),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  bugSuffixOpen = true;
+                  clear();
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    bugSuffixOpen = false;
+                  });
+                },
+                icon: const Icon(Icons.clear),
+              ),
+            ),
+            onSaved: (v) {
+              final TimeOfDay? currentTime = time;
+              widget.onSaved?.call(
+                currentTime == null ? '' : '${_timeToString(currentTime)}:00',
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
+
+  String _timeToString(TimeOfDay currentTime) {
+    return '${currentTime.hour.toString().padLeft(2, '0')}:${currentTime.minute.toString().padLeft(2, '0')}';
+  }
+
   String getDateType() {
     return widget.schema.constraintTypeForDate;
   }
+
   bool isEdited() {
     return widget.schema.edited;
   }
+
   bool isVisible() {
-    return  widget.schema.visible;
+    return widget.schema.visible;
   }
 
   @override
   Widget build(BuildContext context) {
-    bool visible = isVisible();
-    bool edited = isEdited();
-    String datetype = getDateType();
-    String options = getOptions();
+    final bool visible = isVisible();
+    final bool edited = isEdited();
+    final String dateType = getDateType();
 
-    String format = widget.schema.formatDate;
+    final String format = widget.schema.formatDate;
     if (!edited) {
-      return addReadonly(visible,format);
+      return addReadonly(visible, format);
     }
-    if (datetype=="JHOUR" )
+    if (dateType == 'JHOUR') {
       return addTimePicker(visible, format);
-    if (datetype=="JDATETIME" )
+    }
+    if (dateType == 'JDATETIME') {
       return addDateTimePicker(visible, format);
-    if (datetype=="JINTERVALDATE" )
+    }
+    if (dateType == 'JINTERVALDATE') {
       return addIntervalDatePicker(visible, format);
+    }
     return addDatePicker(visible, format);
   }
 }
