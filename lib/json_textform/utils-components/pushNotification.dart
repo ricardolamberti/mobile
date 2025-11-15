@@ -4,76 +4,88 @@ import 'package:astor_mobile/http/astorHttp.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:device_id/device_id.dart';
-import 'package:flutter/foundation.dart' show consolidateHttpClientResponseBytes, debugPrintThrottled, kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:workmanager/workmanager.dart';
 
 late String uuid;
-String deviceType=getDeviceType();
+final String deviceType = getDeviceType();
 
-
-void getDeviceIdentifier() async {
-  if (kIsWeb)
-    uuid="0000000000000000";
-  else
-    uuid=await DeviceId.getID;
+Future<void> getDeviceIdentifier() async {
+  if (kIsWeb) {
+    uuid = "0000000000000000";
+  } else {
+    uuid = await DeviceId.getID;
+  }
 }
 
 String getDeviceType() {
-  if (kIsWeb)
+  if (kIsWeb) {
     return "web";
-  if (Platform.isAndroid)
+  }
+  if (Platform.isAndroid) {
     return "Android";
-  if (Platform.isIOS)
+  }
+  if (Platform.isIOS) {
     return "IOS";
-  if (Platform.isLinux)
+  }
+  if (Platform.isLinux) {
     return "Linux";
-  if (Platform.isMacOS)
+  }
+  if (Platform.isMacOS) {
     return "MacOS";
-  if (Platform.isWindows)
+  }
+  if (Platform.isWindows) {
     return "Windows";
-  if (Platform.isFuchsia)
+  }
+  if (Platform.isFuchsia) {
     return "Fuchsia";
+  }
   return "unknown";
 }
+
 const String taskId = "pwr.notification";
+
 Future<void> subscribeBackroundTask() async {
-  if (kIsWeb) return;
+  if (kIsWeb) {
+    return;
+  }
   Workmanager().initialize(
     callbackDispatcher,
     isInDebugMode: false,
   );
   Workmanager().cancelAll();
-  String channel=GetStorage().read("channel");
-  String url = AstorProvider.url;
-  if (channel!=null && channel!="") {
+  final String? channel = GetStorage().read<String>("channel");
+  final String url = AstorProvider.url;
+  if (channel != null && channel.isNotEmpty) {
     Workmanager().registerPeriodicTask(
       taskId,
       taskId,
       inputData: {
-        "url" : url,
+        "url": url,
         "channel": channel,
       },
-      frequency: Duration(minutes: 15),
+      frequency: const Duration(minutes: 15),
     );
   }
 }
+
 void callbackDispatcher() {
-  if (kIsWeb) return;
+  if (kIsWeb) {
+    return;
+  }
   Workmanager().executeTask((task, inputData) async {
-
     debugPrint("Callback call");
-    PushNotification notification = PushNotification();
-    await notification.communicate(inputData!);
-
+    final PushNotification notification = PushNotification();
+    await notification.communicate(inputData);
     return Future.value(true);
   });
 }
 class PushNotification {
   static final PushNotification _pushNotification = PushNotification._internal();
-  FlutterLocalNotificationsPlugin flip = new FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
   String? channel;
   String? url;
 
@@ -84,66 +96,70 @@ class PushNotification {
   PushNotification._internal() {
     _prepareNotifications();
   }
-  void subscribe(AstorProvider provider) async {
+
+  Future<void> subscribe(AstorProvider provider) async {
     final storage = GetStorage();
-    channel=GetStorage().read("channel");
-    if (channel!=null && channel!="") {
+    channel = storage.read<String>("channel");
+    if (channel != null && channel!.isNotEmpty) {
       debugPrint("Ya suscripto a: {$channel}");
-      await communicate( {
-       "url" : AstorProvider.url,
-       "channel": channel,
+      await communicate({
+        "url": AstorProvider.url,
+        "channel": channel,
       });
 
       return; // ya suscripto
     }
     debugPrint("try subscribe");
-    String channelId=await provider.subscribe();
-    if (channelId==null || channelId=="") {
+    final String channelId = await provider.subscribe();
+    if (channelId.isEmpty) {
       debugPrint("Fallo subscripcion!!!!");
       return; // fallo
     }
-    channel=channelId;
+    channel = channelId;
     debugPrint("suscripto como: {$channel}");
     storage.write("channel", channelId);
     storage.save();
   }
 
-  Future<void> communicate(Map<String,dynamic> inputData) async {
-    channel = inputData['channel'];
-    url = inputData['url'];
+  Future<void> communicate(Map<String, dynamic>? inputData) async {
+    channel = inputData?['channel'] as String? ?? channel;
+    url = inputData?['url'] as String? ?? url;
 
-    if (channel==null) return;
-    if (url==null) return;
-    List<AstorNotif>? notis  = await doNotification();
-    if (notis==null) {
+    if (channel == null || channel!.isEmpty) {
       return;
     }
-    int size = notis.length;
-    for(AstorNotif noti in notis) {
-      _showNotificationWithDefaultSound(noti);
+    if (url == null || url!.isEmpty) {
+      return;
     }
-
+    final List<AstorNotif> notis = await doNotification();
+    if (notis.isEmpty) {
+      return;
+    }
+    for (final AstorNotif noti in notis) {
+      await _showNotificationWithDefaultSound(noti);
+    }
   }
 
   AstorWebHttp getHttp() {
-    AstorWebHttp obj = AstorWebHttp.instance;
+    final AstorWebHttp obj = AstorWebHttp.instance;
     obj.open(url!);
     obj.setResponses(
-        doNotif: processNotif,
+      doNotif: processNotif,
     );
     return obj;
   }
 
-  Future<List<AstorNotif>>? doNotification() {
-    AstorWebHttp astorHttp = getHttp();
+  Future<List<AstorNotif>> doNotification() async {
+    final AstorWebHttp astorHttp = getHttp();
 
-    String nextUrl = "/do-pushnotification";
-    Map<String, String> params = Map<String, String>();
-    params['mobile_channel']=channel!;
+    const String nextUrl = "/do-pushnotification";
+    final Map<String, String> params = <String, String>{
+      'mobile_channel': channel!,
+    };
     return astorHttp.notification(nextUrl, params);
   }
   Future<List<AstorNotif>> processNotif(dynamic json) async {
-    List<AstorNotif> itemsList = [];
+    final List<AstorNotif> itemsList = [];
 
     if (json['messages'] != null) {
       var listItems = json['messages'] as List;
@@ -154,34 +170,34 @@ class PushNotification {
     }
     return itemsList;
   }
-  Future _prepareNotifications() async {
+  Future<void> _prepareNotifications() async {
     // initialise the plugin of flutterlocalnotifications.
 
     // app_icon needs to be a added as a drawable
     // resource to the Android head project.
-    var android = new AndroidInitializationSettings('app_icon');
-    var IOS = new IOSInitializationSettings();
+    const android = AndroidInitializationSettings('app_icon');
+    const IOS = IOSInitializationSettings();
 
     // initialise settings for both Android and iOS device.
-    var settings = new InitializationSettings(android: android, iOS: IOS);
+    const settings = InitializationSettings(android: android, iOS: IOS);
     flip.initialize(settings);
 
   }
 
-  Future _showNotificationWithDefaultSound(AstorNotif notif) async {
+  Future<void> _showNotificationWithDefaultSound(AstorNotif notif) async {
     // Show a notification after every 15 minute with the first
     // appearance happening a minute after invoking the method
-    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'pwr.channel',
         'pwr',
         'pwr communications',
         importance: Importance.max,
         priority: Priority.high
     );
-    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    const iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
     // initialise channel platform for both Android and iOS device.
-    var platformChannelSpecifics = new NotificationDetails(
+    const platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics
     );
