@@ -1,14 +1,11 @@
-import 'package:astor_mobile/json_textform/models/components/AvaliableWidgetTypes.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 
 import '../JSONForm.dart';
-
-// Stub mínimo para evitar error de clase indefinida.
-// Si tenés un controlador real en otro archivo, importalo y borra esto.
-class JSONSchemaController {}
+import '../models/Controller.dart';
+import '../models/components/AvaliableWidgetTypes.dart';
 
 class JSONSubForm extends StatelessWidget implements InterfaceProvider {
   final AstorComponente schema;

@@ -101,31 +101,38 @@ class _JSONTextFormFieldState extends State<JSONTextFormField> {
       return;
     }
 
-    switch (action.actionDone) {
+    final actionDone = action.actionDone;
+    if (actionDone == null) {
+      return;
+    }
+
+    switch (actionDone) {
       case ActionDone.getInput:
         if (inputValue != null) {
           setState(() {
             _controller?.text = inputValue;
           });
-        } else if (image != null && action is FieldAction<File> && action.onDone != null) {
-          final value = await action.onDone!(image);
-          if (value is String) {
-            setState(() {
-              _controller?.text = value;
-            });
+        } else if (image != null && action is FieldAction<File>) {
+          final onDone = action.onDone;
+          if (onDone != null) {
+            final value = await onDone(image);
+            if (value is String) {
+              setState(() {
+                _controller?.text = value;
+              });
+            }
           }
         }
         break;
 
       case ActionDone.getImage:
-        if (image != null && action is FieldAction<File> && action.onDone != null) {
-          await action.onDone!(image);
+        if (image != null && action is FieldAction<File>) {
+          final onDone = action.onDone;
+          if (onDone != null) {
+            await onDone(image);
+          }
         }
         break;
-
-      case null:
-        // Nada que hacer si no hay acción definida
-        return;
     }
   }
 
@@ -203,8 +210,9 @@ class _JSONTextFormFieldState extends State<JSONTextFormField> {
         return IconButton(
           icon: Icon(action.icon),
           onPressed: () async {
-            if (action.onActionTap != null) {
-              final value = await action.onActionTap!(widget.schema);
+            final onActionTap = action.onActionTap;
+            if (onActionTap != null) {
+              final value = await onActionTap(widget.schema);
               await _suffixIconAction(inputValue: value);
             }
           },

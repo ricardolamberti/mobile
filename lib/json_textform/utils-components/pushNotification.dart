@@ -3,44 +3,17 @@ import 'dart:io';
 import 'package:astor_mobile/http/astorHttp.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:workmanager/workmanager.dart'; 
 
 /// IDENTIFICADOR DE DISPOSITIVO
 late String uuid;
 final String deviceType = getDeviceType();
 
 Future<void> getDeviceIdentifier() async {
-  if (kIsWeb) {
-    uuid = "0000000000000000";
-    return;
-  }
-
-  final deviceInfo = DeviceInfoPlugin();
-
-  if (Platform.isAndroid) {
-    final info = await deviceInfo.androidInfo;
-    // Usa un identificador estable pero no sensible (ejemplo: AndroidId)
-    uuid = info.id ?? "android-unknown";
-  } else if (Platform.isIOS) {
-    final info = await deviceInfo.iosInfo;
-    uuid = info.identifierForVendor ?? "ios-unknown";
-  } else if (Platform.isWindows) {
-    final info = await deviceInfo.windowsInfo;
-    uuid = info.deviceId ?? "windows-unknown";
-  } else if (Platform.isLinux) {
-    final info = await deviceInfo.linuxInfo;
-    uuid = info.machineId ?? "linux-unknown";
-  } else if (Platform.isMacOS) {
-    final info = await deviceInfo.macOsInfo;
-    uuid = info.systemGUID ?? "macos-unknown";
-  } else {
-    uuid = "unknown";
-  }
+  uuid = "0000000000000000";
 }
 
 
