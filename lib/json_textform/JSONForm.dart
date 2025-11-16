@@ -52,7 +52,7 @@ class SchemaValues {
 
 typedef OnBuildBody = Widget Function(AstorComponente comp);
 
-typedef OnSearch = Future<List<AstorItem>> Function(
+typedef OnSearch = Future<List<AstorItem>?> Function(
     AstorCombo combo, String keyword);
 
 /// Will be called when user clicks submit button or uses controller to submit
@@ -171,14 +171,15 @@ class _JSONSchemaFormState extends State<JSONForm> {
   }
 
   /// Render body widget based on widget type
-  Widget _buildBodyInternal(AstorComponente schema) {
+  BootstrapCol _buildBodyInternal(AstorComponente schema) {
     return BootstrapCol(
-        sizes: 'col-12',
-        child: JSONDiv(
-          schema: schema,
-          onBuildBody: _buildBodyChild,
-          onFileUpload: widget.onFileUpload,
-        ));
+      sizes: 'col-12',
+      child: JSONDiv(
+        schema: schema,
+        onBuildBody: _buildBodyChild,
+        onFileUpload: widget.onFileUpload,
+      ),
+    );
   }
 
   @override
@@ -217,46 +218,61 @@ class _JSONSchemaFormState extends State<JSONForm> {
 
   /// Render body widget based on widget type
   Widget _buildBodyChild(AstorComponente schema) {
-    switch (schema.widget) {
+    final widgetType = schema.widget;
+    if (widgetType == null) {
+      return const SizedBox.shrink();
+    }
+
+    switch (widgetType) {
       case WidgetType.winlistflat:
-        JSONWinListFlat list = JSONWinListFlat(
+        final list = JSONWinListFlat(
           schema: schema as AstorList,
           onBuildBody: _buildBodyChild,
           onPressed: onPressSubmitButton,
         );
-        Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,list);
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, list);
         return list;
       case WidgetType.swap:
-        JSONSwap list = JSONSwap(
+        final list = JSONSwap(
           schema: schema as AstorSwap,
           onBuildBody: _buildBodyChild,
           onPressed: onPressSubmitButton,
         );
-        Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,list);
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, list);
         return list;
       case WidgetType.winlist:
-        JSONWinList list = JSONWinList(
+        final list = JSONWinList(
           schema: schema as AstorList,
           onBuildBody: _buildBodyChild,
           onPressed: onPressSubmitButton,
         );
-         Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,list);
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, list);
         return list;
       case WidgetType.tree:
-        JSONTree list = JSONTree(
+        final list = JSONTree(
           schema: schema as AstorTree,
           onBuildBody: _buildBodyChild,
           onPressed: onPressSubmitButton,
         );
-        Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,list);
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, list);
         return list;
       case WidgetType.winForm:
-        JSONSubForm form = JSONSubForm(
+        final form = JSONSubForm(
           schema: schema,
           onBuildBody: _buildBodyChild,
         );
-        Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,form);
-      return form;
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, form);
+        return form;
 
       case WidgetType.actionbar:
         return JSONActionBar(
@@ -274,8 +290,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
       case WidgetType.table:
         return JSONTable(
           onBuildBody: _buildBodyChild,
-          schema: schema,
-
+          schema: schema as AstorTable,
         );
       case WidgetType.div:
         return JSONDiv(
@@ -293,7 +308,8 @@ class _JSONSchemaFormState extends State<JSONForm> {
       case WidgetType.infocard:
         return JSONInfoCard(
           schema: schema,
-          onPressed: schema.refreshForm?onRefreshForm:onPressSubmitButton,
+          onPressed:
+              schema.refreshForm ? onRefreshForm : onPressSubmitButton,
           onBuildBody: _buildBodyChild,
         );
       case WidgetType.card:
@@ -370,14 +386,15 @@ class _JSONSchemaFormState extends State<JSONForm> {
           },
         );
       case WidgetType.tabpanel:
+        final tabSchema = schema as AstorTabPanel;
         return JSONTabPanel(
           onPressed: onPressSubmitButton,
           onBuildBody: _buildBodyChild,
-          schema: schema,
+          schema: tabSchema,
           onSaved: (v) {
-               setState(() {
-            schema.value = v;
-               });
+            setState(() {
+              tabSchema.value = v;
+            });
           },
         );
       case WidgetType.dropdown:
@@ -403,7 +420,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
       case WidgetType.radio:
         return JSONSelectField(
           schema: schema as AstorCombo,
-           useRadioButton: true,
+          useRadioButton: true,
           onRefreshForm: onRefreshForm,
           onSaved: (List<AstorItem> value) {
             setState(() {
@@ -412,7 +429,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
             });
           },
         );
-        case WidgetType.select:
+      case WidgetType.select:
         return JSONSelectField(
           schema: schema as AstorCombo,
           useDropdownButton: true,
@@ -425,11 +442,10 @@ class _JSONSchemaFormState extends State<JSONForm> {
           },
         );
       case WidgetType.ddcombo:
-        JSONSelectField dd = JSONSelectField(
+        final dd = JSONSelectField(
           schema: schema as AstorCombo,
           onRefreshForm: onRefreshForm,
           onBuildBody: _buildBodyChild,
-          useDropdownButton: true,
           onSaved: (List<AstorItem> value) {
             setState(() {
               schema.value = value.first.id;
@@ -437,7 +453,9 @@ class _JSONSchemaFormState extends State<JSONForm> {
             });
           },
         );
-        Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,dd);
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, dd);
         return dd;
       case WidgetType.multiple:
         return JSONSelectField(
@@ -459,35 +477,41 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onSaved: (List<AstorItem> value) {
             setState(() {
               if ((schema as AstorCombo).multiple) {
-                schema.value="";
-                for(AstorItem item in value) {
-                  schema.value += (schema.value==""?"":",")+item.id;
+                schema.value = "";
+                for (final AstorItem item in value) {
+                  schema.value +=
+                      (schema.value == "" ? "" : ",") + item.id;
                 }
-              } else
+              } else {
                 schema.value = value.first.id;
+              }
               (schema as AstorCombo).choices = value;
             });
           },
         );
       case WidgetType.ddwinlov:
-        JSONSelectField dd= JSONSelectField(
+        final dd = JSONSelectField(
           schema: schema as AstorCombo,
           onRefreshForm: onRefreshForm,
           onBuildBody: _buildBodyChild,
           onSaved: (List<AstorItem> value) {
             setState(() {
               if ((schema as AstorCombo).multiple) {
-                schema.value="";
-                for(AstorItem item in value) {
-                  schema.value += (schema.value==""?"":",")+item.id;
+                schema.value = "";
+                for (final AstorItem item in value) {
+                  schema.value +=
+                      (schema.value == "" ? "" : ",") + item.id;
                 }
-              } else
+              } else {
                 schema.value = value.first.id;
+              }
               (schema as AstorCombo).choices = value;
             });
           },
         );
-        Provider.of<AstorProvider>(context,listen: false).astorApp.addObjProvider(schema.objProvider,dd);
+        final astorProvider =
+            Provider.of<AstorProvider>(context, listen: false);
+        astorProvider.astorApp?.addObjProvider(schema.objProvider, dd);
         return dd;
       case WidgetType.winlov:
         return JSONSelectField(
@@ -496,12 +520,14 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onSaved: (List<AstorItem> value) {
             setState(() {
               if ((schema as AstorCombo).multiple) {
-                schema.value="";
-                for(AstorItem item in value) {
-                  schema.value += (schema.value==""?"":",")+item.id;
+                schema.value = "";
+                for (final AstorItem item in value) {
+                  schema.value +=
+                      (schema.value == "" ? "" : ",") + item.id;
                 }
-              } else
+              } else {
                 schema.value = value.first.id;
+              }
               (schema as AstorCombo).choices = value;
             });
           },
@@ -553,8 +579,9 @@ class _JSONSchemaFormState extends State<JSONForm> {
       final BuildContext effectiveContext = ctx ?? context;
       final AstorProvider provider =
           Provider.of<AstorProvider>(effectiveContext, listen: false);
+      final astorApp = provider.astorApp;
       final AstorComponente? comp =
-          provider.astorApp.findName(schema.dataTarget.substring(1));
+          astorApp?.findName(schema.dataTarget.substring(1));
       if (comp != null) {
         setState(() {
           comp.forceVisible = !(comp.visible);
