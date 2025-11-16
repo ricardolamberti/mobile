@@ -3,89 +3,118 @@ import 'dart:io';
 import 'package:astor_mobile/http/astorHttp.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
-import 'package:device_id/device_id.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:workmanager/workmanager.dart'; 
 
+/// IDENTIFICADOR DE DISPOSITIVO
 late String uuid;
 final String deviceType = getDeviceType();
 
 Future<void> getDeviceIdentifier() async {
   if (kIsWeb) {
     uuid = "0000000000000000";
+    return;
+  }
+
+  final deviceInfo = DeviceInfoPlugin();
+
+  if (Platform.isAndroid) {
+    final info = await deviceInfo.androidInfo;
+    // Usa un identificador estable pero no sensible (ejemplo: AndroidId)
+    uuid = info.id ?? "android-unknown";
+  } else if (Platform.isIOS) {
+    final info = await deviceInfo.iosInfo;
+    uuid = info.identifierForVendor ?? "ios-unknown";
+  } else if (Platform.isWindows) {
+    final info = await deviceInfo.windowsInfo;
+    uuid = info.deviceId ?? "windows-unknown";
+  } else if (Platform.isLinux) {
+    final info = await deviceInfo.linuxInfo;
+    uuid = info.machineId ?? "linux-unknown";
+  } else if (Platform.isMacOS) {
+    final info = await deviceInfo.macOsInfo;
+    uuid = info.systemGUID ?? "macos-unknown";
   } else {
-    uuid = await DeviceId.getID;
+    uuid = "unknown";
   }
 }
 
+
 String getDeviceType() {
-  if (kIsWeb) {
-    return "web";
-  }
-  if (Platform.isAndroid) {
-    return "Android";
-  }
-  if (Platform.isIOS) {
-    return "IOS";
-  }
-  if (Platform.isLinux) {
-    return "Linux";
-  }
-  if (Platform.isMacOS) {
-    return "MacOS";
-  }
-  if (Platform.isWindows) {
-    return "Windows";
-  }
-  if (Platform.isFuchsia) {
-    return "Fuchsia";
-  }
+  if (kIsWeb) return "web";
+  if (Platform.isAndroid) return "Android";
+  if (Platform.isIOS) return "IOS";
+  if (Platform.isLinux) return "Linux";
+  if (Platform.isMacOS) return "MacOS";
+  if (Platform.isWindows) return "Windows";
+  if (Platform.isFuchsia) return "Fuchsia";
   return "unknown";
 }
 
 const String taskId = "pwr.notification";
 
+/// BACKGROUND TASKS
+/// ------------------------------------------------------------------
+/// Para usar Workmanager necesitarías el paquete `workmanager` añadido
+/// en pubspec + configuración nativa. De momento lo dejo como NO-OP
+/// para que compile sin ese plugin.
+/// ------------------------------------------------------------------
 Future<void> subscribeBackroundTask() async {
-  if (kIsWeb) {
-    return;
-  }
-  Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: false,
+  if (kIsWeb) return;
+
+  // 🔴 Código original (requiere workmanager):
+  //
+  // Workmanager().initialize(
+  //   callbackDispatcher,
+  //   isInDebugMode: false,
+  // );
+  // Workmanager().cancelAll();
+  // final String? channel = GetStorage().read<String>("channel");
+  // final String url = AstorProvider.url;
+  // if (channel != null && channel.isNotEmpty) {
+  //   Workmanager().registerPeriodicTask(
+  //     taskId,
+  //     taskId,
+  //     inputData: {
+  //       "url": url,
+  //       "channel": channel,
+  //     },
+  //     frequency: const Duration(minutes: 15),
+  //   );
+  // }
+
+  debugPrint(
+    'subscribeBackroundTask(): Workmanager deshabilitado (sin dependencia).',
   );
-  Workmanager().cancelAll();
-  final String? channel = GetStorage().read<String>("channel");
-  final String url = AstorProvider.url;
-  if (channel != null && channel.isNotEmpty) {
-    Workmanager().registerPeriodicTask(
-      taskId,
-      taskId,
-      inputData: {
-        "url": url,
-        "channel": channel,
-      },
-      frequency: const Duration(minutes: 15),
-    );
-  }
 }
 
 void callbackDispatcher() {
-  if (kIsWeb) {
-    return;
-  }
-  Workmanager().executeTask((task, inputData) async {
-    debugPrint("Callback call");
-    final PushNotification notification = PushNotification();
-    await notification.communicate(inputData);
-    return Future.value(true);
-  });
+  if (kIsWeb) return;
+
+  // 🔴 Código original (requiere workmanager):
+  //
+  // Workmanager().executeTask((task, inputData) async {
+  //   debugPrint("Callback call");
+  //   final PushNotification notification = PushNotification();
+  //   await notification.communicate(inputData);
+  //   return Future.value(true);
+  // });
+
+  debugPrint('callbackDispatcher(): Workmanager deshabilitado.');
 }
+
+/// NOTIFICACIONES
 class PushNotification {
-  static final PushNotification _pushNotification = PushNotification._internal();
-  final FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
+  static final PushNotification _pushNotification =
+      PushNotification._internal();
+
+  final FlutterLocalNotificationsPlugin flip =
+      FlutterLocalNotificationsPlugin();
+
   String? channel;
   String? url;
 
@@ -118,23 +147,19 @@ class PushNotification {
     channel = channelId;
     debugPrint("suscripto como: {$channel}");
     storage.write("channel", channelId);
-    storage.save();
+    await storage.save();
   }
 
   Future<void> communicate(Map<String, dynamic>? inputData) async {
     channel = inputData?['channel'] as String? ?? channel;
     url = inputData?['url'] as String? ?? url;
 
-    if (channel == null || channel!.isEmpty) {
-      return;
-    }
-    if (url == null || url!.isEmpty) {
-      return;
-    }
+    if (channel == null || channel!.isEmpty) return;
+    if (url == null || url!.isEmpty) return;
+
     final List<AstorNotif> notis = await doNotification();
-    if (notis.isEmpty) {
-      return;
-    }
+    if (notis.isEmpty) return;
+
     for (final AstorNotif noti in notis) {
       await _showNotificationWithDefaultSound(noti);
     }
@@ -158,54 +183,63 @@ class PushNotification {
     };
     return astorHttp.notification(nextUrl, params);
   }
+
   Future<List<AstorNotif>> processNotif(dynamic json) async {
     final List<AstorNotif> itemsList = [];
 
     if (json['messages'] != null) {
-      var listItems = json['messages'] as List;
-      for (var i in listItems) {
-        AstorNotif item = AstorNotif.fromJson(i);
+      final listItems = json['messages'] as List;
+      for (final i in listItems) {
+        final AstorNotif item = AstorNotif.fromJson(i);
         itemsList.add(item);
       }
     }
     return itemsList;
   }
+
   Future<void> _prepareNotifications() async {
-    // initialise the plugin of flutterlocalnotifications.
+    // Inicializa el plugin de notificaciones locales.
 
-    // app_icon needs to be a added as a drawable
-    // resource to the Android head project.
     const android = AndroidInitializationSettings('app_icon');
-    const IOS = IOSInitializationSettings();
 
-    // initialise settings for both Android and iOS device.
-    const settings = InitializationSettings(android: android, iOS: IOS);
-    flip.initialize(settings);
+    // 🔁 API nueva de flutter_local_notifications:
+    //   - DarwinInitializationSettings reemplaza IOSInitializationSettings
+    const darwin = DarwinInitializationSettings();
 
+    const settings = InitializationSettings(
+      android: android,
+      iOS: darwin,
+    );
+
+    await flip.initialize(settings);
   }
 
   Future<void> _showNotificationWithDefaultSound(AstorNotif notif) async {
-    // Show a notification after every 15 minute with the first
-    // appearance happening a minute after invoking the method
+    // Configuración del canal para Android.
+    // 🔁 API nueva:
+    //   - el tercer parámetro ahora es named: channelDescription:
     const androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'pwr.channel',
-        'pwr',
-        'pwr communications',
-        importance: Importance.max,
-        priority: Priority.high
+      'pwr.channel',
+      'pwr',
+      channelDescription: 'pwr communications',
+      importance: Importance.max,
+      priority: Priority.high,
     );
-    const iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
-    // initialise channel platform for both Android and iOS device.
+    // 🔁 API nueva para iOS:
+    const darwinPlatformChannelSpecifics = DarwinNotificationDetails();
+
     const platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics
+      android: androidPlatformChannelSpecifics,
+      iOS: darwinPlatformChannelSpecifics,
     );
-    await flip.show(0, notif.title,
-        notif.info,
-        platformChannelSpecifics, payload: 'Default_Sound'
+
+    await flip.show(
+      0,
+      notif.title,
+      notif.info,
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
     );
   }
-
 }
-
