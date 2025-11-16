@@ -15,7 +15,6 @@ import '/json_textform/components/JSONTextFormField.dart';
 import '/json_textform/components/LoadingDialog.dart';
 import '/json_textform/models/Controller.dart';
 import '/json_textform/models/components/Action.dart';
-import '/json_textform/utils.dart';
 
 import 'components/JSONActionBar.dart';
 import 'components/JSONButton.dart';
@@ -278,6 +277,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
         return JSONActionBar(
           schema: schema,
           onBuildBody: _buildBodyChild,
+          onPressed: onPressSubmitButton,
         );
       case WidgetType.ul:
         return JSONDiv(
@@ -291,6 +291,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
         return JSONTable(
           onBuildBody: _buildBodyChild,
           schema: schema as AstorTable,
+          onPressed: onPressSubmitButton,
         );
       case WidgetType.div:
         return JSONDiv(
@@ -304,6 +305,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           schema: schema,
           onBuildBody: _buildBodyChild,
           onFileUpload: widget.onFileUpload,
+          onPressed: onPressSubmitButton,
         );
       case WidgetType.infocard:
         return JSONInfoCard(
@@ -411,6 +413,8 @@ class _JSONSchemaFormState extends State<JSONForm> {
         return JSONCheckboxField(
           schema: schema,
           onRefreshForm: onRefreshForm,
+          visible: schema.visible,
+          edited: schema.edited,
           onSaved: (v) {
              setState(() {
               schema.value = v;
@@ -570,9 +574,21 @@ class _JSONSchemaFormState extends State<JSONForm> {
             });
           },
         );
+      case WidgetType.number:
+        return JSONTextFormField(
+          key: Key(schema.name),
+          schema: schema,
+          onRefreshForm: onRefreshForm,
+          onSaved: (value) {
+            setState(() {
+              schema.value = value;
+            });
+          },
+        );
+      default:
+        return const SizedBox.shrink();
     }
-    return const SizedBox.shrink();
-  }
+   }
   void onToggleVisibilityTarget(AstorComponente schema,
       [BuildContext? ctx]) async {
     try {

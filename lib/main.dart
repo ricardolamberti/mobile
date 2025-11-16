@@ -17,11 +17,12 @@ import 'json_textform/components/LoadingDialog.dart';
 import 'json_textform/utils-components/pushNotification.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await dotenv.load(fileName: "assets/config.env");
    getDeviceIdentifier();
 
-  runApp(MyApp());
+  runApp(MyApp());Q
 
 
 }
@@ -79,21 +80,21 @@ class _AstorStatePage extends State<AstorPage> {
     AstorProvider astorProvider = Provider.of(context);
     if (astorProvider.astorApp==null || astorProvider.redraw) {
       astorProvider.redraw = false;
-      return FutureBuilder<AstorApp>(
-          future: astorProvider.futureAstorApp,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              astorProvider.astorApp = snapshot.data;
-              astorProvider.checkUserLogin();
-              return AstorScreen(astorApp: astorProvider.astorApp);
-            } else if (snapshot.hasError) {
-              return getMaterialError("${snapshot.error}");
-            }
-            return LoadingDialog();
-          });
+      return FutureBuilder<AstorApp?>(
+      future: astorProvider.futureAstorApp,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          astorProvider.astorApp = snapshot.data;
+          astorProvider.checkUserLogin();
+          return AstorScreen(astorApp: astorProvider.astorApp!);
+        } else if (snapshot.hasError) {
+          return getMaterialError("${snapshot.error}");
+        }
+        return LoadingDialog();
+      });
     }
     else
-      return AstorScreen(astorApp: astorProvider.astorApp);
+      return AstorScreen(astorApp: astorProvider.astorApp!);
   }
 
 

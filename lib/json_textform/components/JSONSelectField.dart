@@ -14,26 +14,31 @@ typedef OnChange = void Function(List<AstorItem> choice);
 class JSONSelectField extends StatelessWidget implements InterfaceProvider {
   final AstorCombo schema;
   final OnChange? onSaved;
+  final OnRefereshForm? onRefreshForm;
 
-  /// implementation. Default is false
+  // ESTOS CAMPOS:
   final bool useDropdownButton;
   final bool useRadioButton;
   final bool useCheckButton;
   final bool useGridButton;
-  final OnBuildBody onBuildBody;
-  final OnRefereshForm? onRefreshForm;
+
+  final OnBuildBody? onBuildBody;
 
   const JSONSelectField({
     super.key,
     required this.schema,
-    required this.useRadioButton,
-    required this.useDropdownButton,
-    required this.useCheckButton,
-    required this.useGridButton,
-    required this.onBuildBody,
-    this.onRefreshForm,
     this.onSaved,
+    this.onRefreshForm,
+
+    // HACERLOS OPCIONALES CON VALOR POR DEFECTO:
+    this.useDropdownButton = false,
+    this.useRadioButton = false,
+    this.useCheckButton = false,
+    this.useGridButton = false,
+
+    this.onBuildBody,
   });
+
 
   List<AstorItem> _selectedValues() {
     return schema.choices.whereType<AstorItem>().toList();
@@ -306,13 +311,14 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
     );
   }
 
-  Widget buildFormAlta(BuildContext context) {
-    return NewPage(
-      schema: schema,
-      onBuildBody: onBuildBody,
-      title: schema.label,
-    );
-  }
+Widget buildFormAlta(BuildContext context) {
+  return NewPage(
+    schema: schema,
+    onBuildBody: onBuildBody ?? (comp) => const SizedBox.shrink(),
+    title: schema.label,
+  );
+}
+
 
   Widget buildCombo(bool visible, BuildContext context) {
     final AstorItem? selectedValue = _selectedValue();

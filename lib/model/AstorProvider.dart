@@ -23,8 +23,6 @@ class AstorProvider with ChangeNotifier {
   static final String url = kIsWeb?dotenv.env["LOCAL_URL"]!: dotenv.env["URL"]!;
 
 
-//   static final String url = kIsWeb?"http://localhost:8080/tkm7": "http://r6.ticketmining.net:7080/tkm7";
-  //static final String url = kIsWeb? "http://localhost:8080/turnos": "http://r6.ticketmining.net:7080/turnos";
 
   Map<String, String> mainForm = Map<String, String>();
 
@@ -38,29 +36,21 @@ class AstorProvider with ChangeNotifier {
     main['dg_action'] = ""; // comunica la accion a realizar
     main['dg_tree_selection'] = ""; // comunica la seleccion en el arbol
     main['dg_source_control_id'] = ""; // contiene el parent en el formlov
-    main['dg_client_conf'] =
-    ""; // configuracion del cliente ancho y alto de la pantalla
+    main['dg_client_conf'] = ""; // configuracion del cliente ancho y alto de la pantalla
     main['dg_act_owner'] = ""; //  comunica el owner action de la accion
     main['dg_is_modal'] = ""; //  comunica si la accion es modal
     main['dg_object_owner'] = ""; //  comunica el object owner de la accion
-    main['dg_object_owner_dest'] =
-    ""; //   comunica el object owner dest de la accion swap
-    main['dg_object_owner_context'] =
-    ""; //  comunica el object owner context para lista extendidas
+    main['dg_object_owner_dest'] = ""; //   comunica el object owner dest de la accion swap
+    main['dg_object_owner_context'] = ""; //  comunica el object owner context para lista extendidas
     main['dg_object_select'] = ""; //   comunica el object select  de la accion
-    main['dg_table_provider'] =
-    ""; //   comunica el action owner de la accion en las solapas
-    main['dg_clear_select'] =
-    ""; //   comunica que se elimina la seleccion anterior
-    main['dg_multiple_owner_list'] =
-    ""; //   comunica multiples owners de la accion
-    main['dg_is_multiple_owner'] =
-    ""; //  comunica si hay multiples owners de la accion
+    main['dg_table_provider'] =""; //   comunica el action owner de la accion en las solapas
+    main['dg_clear_select'] = ""; //   comunica que se elimina la seleccion anterior
+    main['dg_multiple_owner_list'] =""; //   comunica multiples owners de la accion
+    main['dg_is_multiple_owner'] =""; //  comunica si hay multiples owners de la accion
     main['dg_row_select'] = ""; //   comunica multiples owners de la accion
     main['dg_cell_select'] = ""; //  comunica multiples owners de la accion
     main['dg_scroller'] = ""; //  comunica la posicion y del scroll actual
-    main['dg_back_modal'] =
-    ""; //  comunica si los retornos deben hacerse a modal
+    main['dg_back_modal'] =""; //  comunica si los retornos deben hacerse a modal
     main['dg_extra_form_data'] = ""; //  si el form es embedded
     main['dg_stadistics'] = ""; //  informacion estadistica
     main['dg_url'] = url; //   url address
