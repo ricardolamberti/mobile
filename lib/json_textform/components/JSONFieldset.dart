@@ -39,7 +39,7 @@ class JSONFieldset extends StatelessWidget {
   final OnBuildBody onBuildBody;
 
   const JSONFieldset({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
@@ -63,7 +63,7 @@ class JSONFieldset extends StatelessWidget {
     this.onAddforeignKeyField,
     this.onFileUpload,
     this.onDeleteforeignKeyField,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -76,9 +76,9 @@ class JSONFieldset extends StatelessWidget {
 
 
   Widget addFieldset(BuildContext context) {
-    final String? title = schema.title;
-    final String? subtitle = schema.labelRight;
-    if (title == null) {
+    final String title = schema.title;
+    final String subtitle = schema.labelRight;
+    if (title == '') {
       return JSONDiv(
         onBuildBody: onBuildBody,
         schema: schema,

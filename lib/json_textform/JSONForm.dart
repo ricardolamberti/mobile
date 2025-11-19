@@ -137,7 +137,7 @@ class JSONForm extends StatefulWidget {
   final OnSubmit? onSubmit;
 
   const JSONForm({
-    Key? key,
+    super.key,
     required this.schema,
     this.onSearch,
     this.onSubmit,
@@ -148,7 +148,7 @@ class JSONForm extends StatefulWidget {
     this.controller,
     this.loadingDialog,
     this.onFileUpload,
-  }) : super(key: key);
+  });
 
   @override
   _JSONSchemaFormState createState() => _JSONSchemaFormState();
@@ -351,8 +351,9 @@ class _JSONSchemaFormState extends State<JSONForm> {
               List<String> values=value.split(" - ");
               schema.value = values[0];
               schema.value2 = values[1];
-            } else
+            } else {
               schema.value = value;
+            }
                });
           },
         );
@@ -429,7 +430,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onSaved: (List<AstorItem> value) {
             setState(() {
               schema.value = value.first.id;
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );
@@ -441,7 +442,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onSaved: (List<AstorItem> value) {
              setState(() {
               schema.value = value.first.id;
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );
@@ -453,7 +454,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onSaved: (List<AstorItem> value) {
             setState(() {
               schema.value = value.first.id;
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );
@@ -469,7 +470,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onSaved: (List<AstorItem> value) {
             setState(() {
               schema.value = value.first.id;
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );
@@ -480,7 +481,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           useCheckButton: true,
           onSaved: (List<AstorItem> value) {
             setState(() {
-              if ((schema as AstorCombo).multiple) {
+              if ((schema).multiple) {
                 schema.value = "";
                 for (final AstorItem item in value) {
                   schema.value +=
@@ -489,7 +490,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
               } else {
                 schema.value = value.first.id;
               }
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );
@@ -500,7 +501,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onBuildBody: _buildBodyChild,
           onSaved: (List<AstorItem> value) {
             setState(() {
-              if ((schema as AstorCombo).multiple) {
+              if ((schema).multiple) {
                 schema.value = "";
                 for (final AstorItem item in value) {
                   schema.value +=
@@ -509,7 +510,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
               } else {
                 schema.value = value.first.id;
               }
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );
@@ -523,7 +524,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
           onRefreshForm: onRefreshForm,
           onSaved: (List<AstorItem> value) {
             setState(() {
-              if ((schema as AstorCombo).multiple) {
+              if ((schema).multiple) {
                 schema.value = "";
                 for (final AstorItem item in value) {
                   schema.value +=
@@ -532,7 +533,7 @@ class _JSONSchemaFormState extends State<JSONForm> {
               } else {
                 schema.value = value.first.id;
               }
-              (schema as AstorCombo).choices = value;
+              (schema).choices = value;
             });
           },
         );

@@ -29,9 +29,9 @@ class AstorScreen extends StatefulWidget {
   final AstorApp astorApp;
 
   const AstorScreen({
-    Key? key,
+    super.key,
     required this.astorApp,
-  }) : super(key: key);
+  });
 
   @override
   _AstorScreenState createState() => _AstorScreenState();

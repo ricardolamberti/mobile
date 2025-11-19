@@ -11,10 +11,10 @@ class JSONMessage extends StatelessWidget {
   // final OnPressed onPressed;
 
   const JSONMessage({
-    Key? key,
+    super.key,
     required this.schema,
     // required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:workmanager/workmanager.dart';
 
 /// IDENTIFICADOR DE DISPOSITIVO
 late String uuid;
@@ -39,26 +40,25 @@ const String taskId = "pwr.notification";
 Future<void> subscribeBackroundTask() async {
   if (kIsWeb) return;
 
-  // 🔴 Código original (requiere workmanager):
-  //
-  // Workmanager().initialize(
-  //   callbackDispatcher,
-  //   isInDebugMode: false,
-  // );
-  // Workmanager().cancelAll();
-  // final String? channel = GetStorage().read<String>("channel");
-  // final String url = AstorProvider.url;
-  // if (channel != null && channel.isNotEmpty) {
-  //   Workmanager().registerPeriodicTask(
-  //     taskId,
-  //     taskId,
-  //     inputData: {
-  //       "url": url,
-  //       "channel": channel,
-  //     },
-  //     frequency: const Duration(minutes: 15),
-  //   );
-  // }
+  
+  Workmanager().initialize(
+    callbackDispatcher,
+  );
+
+   Workmanager().cancelAll();
+   final String? channel = GetStorage().read<String>("channel");
+   final String url = AstorProvider.url;
+   if (channel != null && channel.isNotEmpty) {
+     Workmanager().registerPeriodicTask(
+       taskId,
+       taskId,
+       inputData: {
+         "url": url,
+         "channel": channel,
+       },
+       frequency: const Duration(minutes: 15),
+     );
+   }
 
   debugPrint(
     'subscribeBackroundTask(): Workmanager deshabilitado (sin dependencia).',
@@ -68,14 +68,13 @@ Future<void> subscribeBackroundTask() async {
 void callbackDispatcher() {
   if (kIsWeb) return;
 
-  // 🔴 Código original (requiere workmanager):
-  //
-  // Workmanager().executeTask((task, inputData) async {
-  //   debugPrint("Callback call");
-  //   final PushNotification notification = PushNotification();
-  //   await notification.communicate(inputData);
-  //   return Future.value(true);
-  // });
+  
+   Workmanager().executeTask((task, inputData) async {
+     debugPrint("Callback call");
+     final PushNotification notification = PushNotification();
+     await notification.communicate(inputData);
+     return Future.value(true);
+  });
 
   debugPrint('callbackDispatcher(): Workmanager deshabilitado.');
 }

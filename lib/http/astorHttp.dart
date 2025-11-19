@@ -8,11 +8,11 @@ if (dart.library.js) 'package:astor_mobile/http/httpJs.dart';
 
 
 
-typedef Future<AstorApp> OnResponse(dynamic value);
-typedef Future<List<AstorItem>> OnAjax(dynamic value);
-typedef Future<AstorApp> OnDownload(File value);
-typedef Future<List<AstorNotif>> OnNotif(dynamic value);
-typedef Future<String> OnSubscribe(dynamic value);
+typedef OnResponse = Future<AstorApp> Function(dynamic value);
+typedef OnAjax = Future<List<AstorItem>> Function(dynamic value);
+typedef OnDownload = Future<AstorApp> Function(File value);
+typedef OnNotif = Future<List<AstorNotif>> Function(dynamic value);
+typedef OnSubscribe = Future<String> Function(dynamic value);
 
 abstract class AstorWebHttp {
 

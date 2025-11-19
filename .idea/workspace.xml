@@ -1,5 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e4b8c947-37f3-46e6-b0e5-f47d7957baff" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/kotlin/com/example/astormobile/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/kotlin/com/example/astormobile/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/config.env" beforeDir="false" afterPath="$PROJECT_DIR$/assets/config.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astormobile.iml" beforeDir="false" afterPath="$PROJECT_DIR$/astormobile.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/astorScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/astorScreen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/http/astorHttp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/http/astorHttp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/http/httpJs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/http/httpJs.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/http/httpPhone.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/http/httpPhone.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/JSONForm.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/JSONForm.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/JSONSchemaForm.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/JSONSchemaForm.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONActionBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONActionBar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONActionBarSideBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONActionBarSideBar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONButton.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONButton.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONCard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONCard.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONCheckboxField.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONCheckboxField.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONColor.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONColor.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONDiv.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONDiv.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONFieldset.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONFieldset.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONIcon.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONIcon.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONInfoCard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONInfoCard.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONLabel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONLabel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONLine.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONLine.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONMessage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONMessage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONNavigationBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONNavigationBar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONSelectField.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONSelectField.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONSubForm.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONSubForm.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONSwap.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONSwap.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONTabPanel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONTabPanel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONTable.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONTable.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONTree.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONTree.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONWinList.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONWinList.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONWinListFlat.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONWinListFlat.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/LoadingDialog.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/LoadingDialog.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/pages/NewPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/pages/NewPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/pages/SelectionPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/pages/SelectionPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/utils-components/pushNotification.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/utils-components/pushNotification.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/utils.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/utils.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/AstorProvider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/AstorProvider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/astorSchema.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/astorSchema.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/linux/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
   <component name="FileEditorManager">
     <leaf>
       <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
@@ -13,24 +97,78 @@
       </file>
     </leaf>
   </component>
-  <component name="ToolWindowManager">
-    <editor active="true" />
-    <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-    </layout>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="35ZcGWIz9dq462SdXodml1zH6co" />
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-    </navigator>
+    <navigator currentView="ProjectPane" proportions="" version="1" />
     <panes>
       <pane id="ProjectPane">
         <option name="show-excluded-files" value="false" />
       </pane>
     </panes>
   </component>
-  <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="dart.analysis.tool.window.force.activate" value="true" />
-    <property name="show.migrate.to.gradle.popup" value="false" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;io.flutter.project.isFirstOpen&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/dev/astorMobileV2/mobile&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\dev\astorMobileV2\mobile\assets" />
+    </key>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e4b8c947-37f3-46e6-b0e5-f47d7957baff" name="Changes" comment="" />
+      <created>1763320940139</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763320940139</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+    </layout>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/json_textform/components/JSONCard.dart</url>
+          <line>79</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="dart-exception" />
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

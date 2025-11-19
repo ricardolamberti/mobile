@@ -11,10 +11,10 @@ class JSONLabel extends StatelessWidget {
   final OnBuildBody onBuildBody;
 
   const JSONLabel({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class JSONLabel extends StatelessWidget {
       title = schema.title;
     }
     final bool composite = schema.composite == true;
-    final double? size = schema.sizeHResponsive;
+    final double size = schema.sizeHResponsive;
     if (composite) {
       return Column(
         children: <Widget>[

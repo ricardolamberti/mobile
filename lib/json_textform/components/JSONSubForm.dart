@@ -64,7 +64,7 @@ class JSONSubForm extends StatelessWidget implements InterfaceProvider {
         ],
       );
     } else if (inline) {
-      return ButtonBar(
+      return OverflowBar(
         children: [
           for (final comp in schemaList.where(
             (element) => element.widget != null,

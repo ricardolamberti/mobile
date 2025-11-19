@@ -8,9 +8,9 @@ class JSONLine extends StatelessWidget {
   final AstorComponente schema;
 
   const JSONLine({
-    Key? key,
+    super.key,
     required this.schema,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

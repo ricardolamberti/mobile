@@ -21,14 +21,14 @@ class JSONInfoCard extends StatelessWidget {
   final OnBuildBody onBuildBody;
 
   const JSONInfoCard({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     this.onSaved,
     this.showIcon = true,
     this.isOutlined = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

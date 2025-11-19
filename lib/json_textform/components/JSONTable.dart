@@ -10,11 +10,11 @@ class JSONTable extends StatelessWidget {
   final OnBuildBody onBuildBody;
 
   const JSONTable({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -14,11 +14,11 @@ class JSONActionBarSideBar extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
    JSONActionBarSideBar({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onPressed,
     this.onSaved,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -20,12 +20,12 @@ class JSONActionBar extends StatelessWidget {
   final OnBuildBody onBuildBody;
 
   const JSONActionBar({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     this.onSaved,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

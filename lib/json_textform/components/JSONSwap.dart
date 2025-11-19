@@ -16,14 +16,14 @@ class JSONSwap extends StatefulWidget implements InterfaceProvider {
   final bool clearSelection;
 
   const JSONSwap({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     this.onSaved,
     this.isMultiple = false,
     this.clearSelection = false,
-  }) : super(key: key);
+  });
   @override
   _JSONSwapState createState() => _JSONSwapState();
 
@@ -50,7 +50,7 @@ class JSONSwap extends StatefulWidget implements InterfaceProvider {
   String? getMultipleActionOwnerList() {
     String output="";
     for (AstorItem schemaRows in schema.destino) {
-      output+= schemaRows.id+";";
+      output+= "${schemaRows.id};";
     }
     return output;
   }
@@ -208,19 +208,19 @@ class _JSONSwapState extends State<JSONSwap> {
                       });
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
+                      padding: WidgetStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(15),
                       ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                           side: const BorderSide(color: Colors.blue),
                         ),
                       ),
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
+                          WidgetStateProperty.all<Color>(Colors.blue),
                       foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
+                          WidgetStateProperty.all<Color>(Colors.white),
                     ),
                     child: const Text('>>')),
                 const Divider(),
@@ -235,19 +235,19 @@ class _JSONSwapState extends State<JSONSwap> {
                       });
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
+                      padding: WidgetStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(15),
                       ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                           side: const BorderSide(color: Colors.blue),
                         ),
                       ),
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
+                          WidgetStateProperty.all<Color>(Colors.blue),
                       foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
+                          WidgetStateProperty.all<Color>(Colors.white),
                     ),
                     child: const Text('->')),
                 const Divider(),
@@ -263,19 +263,19 @@ class _JSONSwapState extends State<JSONSwap> {
 
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
+                      padding: WidgetStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(15),
                       ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                           side: const BorderSide(color: Colors.blue),
                         ),
                       ),
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
+                          WidgetStateProperty.all<Color>(Colors.blue),
                       foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
+                          WidgetStateProperty.all<Color>(Colors.white),
                     ),
                     child: const Text('<-')),
                 const Divider(),
@@ -288,19 +288,19 @@ class _JSONSwapState extends State<JSONSwap> {
                       });
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
+                      padding: WidgetStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(15),
                       ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                           side: const BorderSide(color: Colors.blue),
                         ),
                       ),
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
+                          WidgetStateProperty.all<Color>(Colors.blue),
                       foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
+                          WidgetStateProperty.all<Color>(Colors.white),
                     ),
                     child: const Text('<<')),
               ],

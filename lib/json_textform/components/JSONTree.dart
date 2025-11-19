@@ -27,15 +27,15 @@ class JSONTree extends StatefulWidget implements InterfaceProvider {
   /// indica si hay que limpiar la selección actual
   final bool clearSelection;
 
-  JSONTree({
-    Key? key,
+  const JSONTree({
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     this.onSaved,
     this.isMultiple = false,
     this.clearSelection = false,
-  }) : super(key: key);
+  });
 
   @override
   _JSONTreeState createState() => _JSONTreeState();
@@ -47,7 +47,7 @@ class JSONTree extends StatefulWidget implements InterfaceProvider {
 
   @override
   String getCurrentActionOwner() {
-    if (isMultiple) {
+    if (!isMultiple) {
       return getSingleActionOwnerList();
     }
     return getMultipleActionOwnerList();
@@ -226,8 +226,8 @@ class _JSONTreeState extends State<JSONTree> {
           onSelectChanged: (bool? isSelected) {
             select(schemaRows);
           },
-          color: MaterialStateColor.resolveWith(
-            (Set<MaterialState> states) => states.contains(MaterialState.selected)
+          color: WidgetStateColor.resolveWith(
+            (Set<WidgetState> states) => states.contains(WidgetState.selected)
                 ? Colors.lightBlue
                 : (schemaRows.hasChilds
                     ? const Color.fromARGB(100, 149, 151, 153)
@@ -319,8 +319,8 @@ class _JSONTreeState extends State<JSONTree> {
       onSelectAll: selectAll,
       decoration:
           BoxDecoration(border: Border.all(color: Colors.blue, width: 1)),
-      dataRowColor: MaterialStateColor.resolveWith(
-        (Set<MaterialState> states) => states.contains(MaterialState.selected)
+      dataRowColor: WidgetStateColor.resolveWith(
+        (Set<WidgetState> states) => states.contains(WidgetState.selected)
             ? Colors.blue
             : const Color.fromARGB(100, 215, 217, 219),
       ),
@@ -330,7 +330,7 @@ class _JSONTreeState extends State<JSONTree> {
         color: Colors.black,
       ),
       headingRowColor:
-          MaterialStateColor.resolveWith((states) => Colors.blue),
+          WidgetStateColor.resolveWith((states) => Colors.blue),
       headingRowHeight: 40,
       headingTextStyle: const TextStyle(
         fontWeight: FontWeight.bold,

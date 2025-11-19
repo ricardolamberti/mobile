@@ -9,11 +9,11 @@ class NewPage extends StatefulWidget {
   final String title;
 
   const NewPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.schema,
     required this.onBuildBody,
-  }) : super(key: key);
+  });
 
   @override
   _NewPageState createState() => _NewPageState();

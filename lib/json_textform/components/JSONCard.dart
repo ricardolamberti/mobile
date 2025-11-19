@@ -11,10 +11,10 @@ class JSONCard extends StatefulWidget {
   final OnBuildBody onBuildBody;
 
   const JSONCard({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
-  }) : super(key: key);
+  });
 
   @override
   _JSONCardState createState() => _JSONCardState();

@@ -1,4 +1,4 @@
-package com.example.astormobile
+package com.pwr.astormobile
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -19,10 +19,10 @@ class JSONIcon extends StatelessWidget {
   final double? size;
 
   const JSONIcon({
-    Key? key,
+    super.key,
     required this.schema,
     this.size,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +41,9 @@ class JSONIcon extends StatelessWidget {
       }
       return FaIcon(iconData, size: size);
     } else if (iconSource == 'pss_icon') {
-      return Image.network(iconPath + '/pss_icon/' + iconFile);
+      return Image.network('$iconPath/pss_icon/$iconFile');
     } else if (iconSource == 'pssdata_resource') {
-      return Image.network(iconPath + '/pssdata_resource/' + iconFile);
+      return Image.network('$iconPath/pssdata_resource/$iconFile');
     } else if (iconSource == 'webapp_url') {
       if (iconFile.startsWith("data:image/")) {
         final image = base64Decode(
@@ -55,9 +55,9 @@ class JSONIcon extends StatelessWidget {
       }
       return Image.network(iconFile);
     } else if (iconSource == 'pss_data') {
-      return Image.network(iconPath + '/pss_data/' + iconFile);
+      return Image.network('$iconPath/pss_data/$iconFile');
     } else {
-      return Image.network(iconPath + '/' + iconFile);
+      return Image.network('$iconPath/$iconFile');
     }
   }
 

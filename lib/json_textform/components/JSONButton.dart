@@ -12,11 +12,11 @@ class JSONButton extends StatelessWidget {
   final OnPressed onPressed;
 
   const JSONButton({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onPressed,
     this.onSaved,
-  }) : super(key: key);
+  });
 
   ButtonStyle? getResponsiveBoxButtonStyle() {
     Color fore = Colors.blue;
@@ -26,35 +26,35 @@ class JSONButton extends StatelessWidget {
     if (pos.isEmpty) return null;
     final List<String> commands = pos.split(' ');
     for (String command in commands) {
-      if (command.indexOf("btn-") == -1) {
+      if (!command.contains("btn-")) {
         continue;
       }
-      if (command.indexOf("-outline") != -1) {
+      if (command.contains("-outline")) {
         fore = Colors.blue;
         fill = null;
         border = Colors.blue;
       }
-      if (command.indexOf("-primary") != -1) {
+      if (command.contains("-primary")) {
         fill = Colors.blue;
         fore = Colors.white;
         border = Colors.blue;
-      } else if (command.indexOf("-default") != -1) {
+      } else if (command.contains("-default")) {
         fill = Colors.white;
         fore = Colors.black87;
         border = Colors.black45;
-      } else if (command.indexOf("-danger") != -1) {
+      } else if (command.contains("-danger")) {
         fill = Colors.red;
         border = Colors.red;
         fore = Colors.white;
-      } else if (command.indexOf("-warning") != -1) {
+      } else if (command.contains("-warning")) {
         fill = Colors.yellow;
         border = Colors.yellow;
         fore = Colors.white;
-      } else if (command.indexOf("-success") != -1) {
+      } else if (command.contains("-success")) {
         fill = Colors.green;
         border = Colors.green;
         fore = Colors.white;
-      } else if (command.indexOf("-info") != -1) {
+      } else if (command.contains("-info")) {
         fill = Colors.lightBlueAccent;
         border = Colors.lightBlueAccent;
         fore = Colors.white;
@@ -62,10 +62,10 @@ class JSONButton extends StatelessWidget {
     }
     if (fill != null) {
       return ButtonStyle(
-        padding: MaterialStateProperty.all<EdgeInsets>(
+        padding: WidgetStateProperty.all<EdgeInsets>(
           const EdgeInsets.all(15),
         ),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               schema.modeButton == 'button' ? 30.0 : 5.0,
@@ -73,16 +73,16 @@ class JSONButton extends StatelessWidget {
             side: BorderSide(color: border ?? Colors.transparent),
           ),
         ),
-        backgroundColor: MaterialStateProperty.all(fill),
-        foregroundColor: MaterialStateProperty.all(fore),
+        backgroundColor: WidgetStateProperty.all(fill),
+        foregroundColor: WidgetStateProperty.all(fore),
       );
     }
     if (border != null) {
       return ButtonStyle(
-        padding: MaterialStateProperty.all<EdgeInsets>(
+        padding: WidgetStateProperty.all<EdgeInsets>(
           const EdgeInsets.all(15),
         ),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               schema.modeButton == 'button' ? 30.0 : 5.0,
@@ -90,11 +90,11 @@ class JSONButton extends StatelessWidget {
             side: BorderSide(color: border ?? Colors.transparent),
           ),
         ),
-        foregroundColor: MaterialStateProperty.all(fore),
+        foregroundColor: WidgetStateProperty.all(fore),
       );
     }
     return ButtonStyle(
-      padding: MaterialStateProperty.all<EdgeInsets>(
+      padding: WidgetStateProperty.all<EdgeInsets>(
         const EdgeInsets.all(15),
       ),
     );
@@ -114,7 +114,7 @@ class JSONButton extends StatelessWidget {
         child: TextButton.icon(
           icon: JSONIcon(schema: schema),
           label: Text(
-            "${schema.label}",
+            schema.label,
             style: const TextStyle(fontSize: 15),
           ),
           style: getResponsiveBoxButtonStyle(),
@@ -128,19 +128,19 @@ class JSONButton extends StatelessWidget {
         schema.isCollapsableButtonWithinIcon ||
         schema.isButtonWithinIcon) {
       return TextButton(
-        child: Text(
-          "${schema.label}",
-          style: const TextStyle(fontSize: 15),
-        ),
         style: getResponsiveBoxButtonStyle(),
         onPressed: () {
           onPressed(schema, context);
         },
+        child: Text(
+          "${schema.label}",
+          style: const TextStyle(fontSize: 15),
+        ),
       );
     }
     return TextButton(
       child: Text(
-        "${schema.label}",
+        schema.label,
         style: const TextStyle(fontSize: 15),
       ),
       onPressed: () {

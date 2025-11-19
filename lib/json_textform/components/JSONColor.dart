@@ -8,11 +8,11 @@ class JSONColorField extends StatefulWidget {
   final bool inList;
 
   const JSONColorField({
-    Key? key,
+    super.key,
     required this.schema,
     this.onSaved,
     this.inList = false,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

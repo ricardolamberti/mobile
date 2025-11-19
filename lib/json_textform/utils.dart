@@ -2,7 +2,6 @@
 // import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
 
-import 'components/JSONDiv.dart';
 
 /// Will return the json like object base on the
 /// schema's value and name in [schemaList].

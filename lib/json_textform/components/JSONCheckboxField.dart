@@ -16,21 +16,21 @@ class JSONCheckboxField extends StatelessWidget {
   final OnRefereshForm? onRefreshForm;
 
   const JSONCheckboxField({
-    Key? key,
+    super.key,
     required this.schema,
     this.onSaved,
     this.showIcon = true,
     this.onRefreshForm,
     required this.visible,
     required this.edited,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final bool visible = schema.visible;
     final bool edited = schema.edited;
     final String mode = schema.mode;
-    if (mode=='toggle')
+    if (mode=='toggle') {
       return Visibility(
         visible: visible,
         child: SwitchListTile(
@@ -42,11 +42,12 @@ class JSONCheckboxField extends StatelessWidget {
                 onRefreshForm?.call(schema, context);
               }
             },
-            title: Text("${schema.label}"),
+            title: Text(schema.label),
             subtitle: Text(schema.help),
             secondary: !schema.hasIcon?null:JSONIcon(schema: schema)
         ),
       );
+    }
     return Visibility(
       visible: visible,
       child: CheckboxListTile(
@@ -58,7 +59,7 @@ class JSONCheckboxField extends StatelessWidget {
             onRefreshForm?.call(schema, context);
           }
         },
-        title: Text("${schema.label}"),
+        title: Text(schema.label),
         subtitle: Text(schema.help),
         secondary: JSONIcon(schema: schema)
       ),

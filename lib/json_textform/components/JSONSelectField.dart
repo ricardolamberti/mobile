@@ -221,22 +221,22 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
                         }
                       },
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsets>(
+                        padding: WidgetStateProperty.all<EdgeInsets>(
                           const EdgeInsets.all(0),
                         ),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(0.0),
                             side: const BorderSide(color: Colors.blue),
                           ),
                         ),
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                           selectedValue == choice
                               ? Colors.blue
                               : Colors.white,
                         ),
-                        foregroundColor: MaterialStateProperty.all(
+                        foregroundColor: WidgetStateProperty.all(
                           selectedValue == choice
                               ? Colors.white
                               : Colors.blue,
@@ -423,7 +423,7 @@ Widget buildFormAlta(BuildContext context) {
                               }
                             },
                             activeTrackColor: Colors.lightBlueAccent,
-                            activeColor: Colors.blue,
+                            activeThumbColor: Colors.blue,
                             inactiveTrackColor: Colors.grey,
                             inactiveThumbColor: Colors.black45,
                           ),

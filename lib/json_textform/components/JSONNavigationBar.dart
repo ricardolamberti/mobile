@@ -19,7 +19,7 @@ class JSONNavigationBar extends StatefulWidget {
   final OnPressed onPressed;
 
   const JSONNavigationBar({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onPressed,
     this.icons,
@@ -27,7 +27,7 @@ class JSONNavigationBar extends StatefulWidget {
     this.values,
     this.schemaName,
     this.controller,
-  }) : super(key: key);
+  });
 
   @override
   JSONNavigationBarState createState() => JSONNavigationBarState();
@@ -74,8 +74,7 @@ class JSONNavigationBarState extends State<JSONNavigationBar> {
 
 
 class DataPopUp extends StatelessWidget {
-  const DataPopUp(this.popup, this.onPressed, this.context, {Key? key})
-      : super(key: key);
+  const DataPopUp(this.popup, this.onPressed, this.context, {super.key});
 
   final AstorComponente popup;
   final OnPressed onPressed;

@@ -14,14 +14,14 @@ class JSONTabPanel extends StatelessWidget {
   final OnBuildBody onBuildBody;
 
   const JSONTabPanel({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     required this.onSaved,
     this.showIcon = true,
     this.isOutlined = false,
-  }) : super(key: key);
+  });
 
   int getIndex(String? key) {
     int id = 0;

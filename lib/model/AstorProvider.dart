@@ -24,10 +24,10 @@ class AstorProvider with ChangeNotifier {
 
 
 
-  Map<String, String> mainForm = Map<String, String>();
+  Map<String, String> mainForm = <String, String>{};
 
   Map<String, String> buildMainForm(Map<String, dynamic> json) {
-    Map<String, String> main = Map<String, String>();
+    Map<String, String> main = <String, String>{};
     main['dg_dictionary'] = json['dictionary'];
     main['dg_request'] = json['request'];
     main['subsession'] = json['subsession'];
@@ -66,8 +66,9 @@ class AstorProvider with ChangeNotifier {
 
   set redraw(bool value) {
     _redraw = value;
-    if (_redraw)
+    if (_redraw) {
       notifyListeners();
+    }
   }
 
   set futureAstorApp(Future<AstorApp?>? value) {
@@ -82,7 +83,7 @@ class AstorProvider with ChangeNotifier {
 
   bool get redraw => _redraw;
 
-  reload() {
+  void reload() {
     _futureAstorApp = firstAction();
     notifyListeners();
   }
@@ -96,13 +97,12 @@ class AstorProvider with ChangeNotifier {
   // }
   Future<AstorApp?>? doAction(AstorComponente comp, BuildContext? context,
       String? zActionTarget, bool? zuploaddata, bool zredraw) {
-    Map<String, dynamic> parameters = Map<String, dynamic>();
-    Map<String, String> params = Map<String, String>();
-    Map<String, dynamic> parametersFormLov = Map<String, dynamic>();
-    String actionTarget = zActionTarget != null ? zActionTarget : comp
-        .actionTarget;
+    Map<String, dynamic> parameters = <String, dynamic>{};
+    Map<String, String> params = <String, String>{};
+    Map<String, dynamic> parametersFormLov = <String, dynamic>{};
+    String actionTarget = zActionTarget ?? comp.actionTarget;
     String ajaxContainer = comp.ajaxContainer;
-    bool uploaddata = zuploaddata != null ? zuploaddata : comp.uploadData;
+    bool uploaddata = zuploaddata ?? comp.uploadData;
     bool modoGet = true;
     addActionOwnerParameters(actionTarget, comp, context);
     if ((ajaxContainer != "") && astorApp != null) {
@@ -115,16 +115,17 @@ class AstorProvider with ChangeNotifier {
     }
 
 
-    if (context != null)
+    if (context != null) {
       addLoginParameters(params, actionTarget, context);
+    }
 
     String nextUrl = "";
-    nextUrl += "/" + actionTarget;
+    nextUrl += "/$actionTarget";
     params.addAll(mainForm);
     toParams(params, parameters);
     // addTreeParameters(zFormToSubmit); no implementado
     if (modoGet) {
-      nextUrl += "?" + toUrl(params);
+      nextUrl += "?${toUrl(params)}";
       futureAstorApp = astorHttp.get(nextUrl);
     } else {
       futureAstorApp = astorHttp.post(nextUrl, params);
@@ -138,7 +139,7 @@ class AstorProvider with ChangeNotifier {
 
   Future<String> subscribe() {
     String nextUrl = "/do-getchannel";
-    Map<String, String> params = Map<String, String>();
+    Map<String, String> params = <String, String>{};
     params.addAll(mainForm);
     params['mobile_uuid']=uuid;
     params['mobile_type']=getDeviceType();
@@ -149,16 +150,16 @@ class AstorProvider with ChangeNotifier {
   Future<AstorApp?>? doDiferido(AstorComponente comp, BuildContext? context,
       String? zActionTarget) {
 
-    Map<String, dynamic> parameters = Map<String, dynamic>();
-    Map<String, String> params = Map<String, String>();
-    Map<String, dynamic> parametersFormLov = Map<String, dynamic>();
-    String actionTarget = zActionTarget != null ? zActionTarget : comp.actionTarget;
+    Map<String, dynamic> parameters = <String, dynamic>{};
+    Map<String, String> params = <String, String>{};
+    Map<String, dynamic> parametersFormLov = <String, dynamic>{};
+    String actionTarget = zActionTarget ?? comp.actionTarget;
     String ajaxContainer = comp.ajaxContainer;
     addActionOwnerParameters(actionTarget, comp, context);
     addSubmitParameters(params, actionTarget, comp);
 
     String nextUrl = "";
-    nextUrl += "/" + actionTarget;
+    nextUrl += "/$actionTarget";
     params.addAll(mainForm);
     toParams(params, parameters);
     // addTreeParameters(zFormToSubmit); no implementado
@@ -169,7 +170,7 @@ class AstorProvider with ChangeNotifier {
   Future<List<AstorNotif>>? doNotification() {
 
     String nextUrl = "do-pushnotification";
-    Map<String, String> params = Map<String, String>();
+    Map<String, String> params = <String, String>{};
     params.addAll(mainForm);
     params['mobile_id']=uuid;
     params['mobile_type']=deviceType;
@@ -197,7 +198,7 @@ class AstorProvider with ChangeNotifier {
     userLogin=null;
     return astorHttp.get('/mobile-do');
   }
-  static String? userLogin=null;
+  static String? userLogin;
 
   void checkUserLogin() {
     if (_astorApp==null) return;
@@ -221,11 +222,12 @@ class AstorProvider with ChangeNotifier {
 
   Future<AstorApp> processResponse(dynamic json) async {
     String ajaxContainer = json['ajax_container'];
-    if (ajaxContainer.startsWith("modal_"))
+    if (ajaxContainer.startsWith("modal_")) {
       ajaxContainer = "view_area_and_title"; // modal no implementado
+    }
 
     buildMainForm(json);
-    if (ajaxContainer == null || ajaxContainer == "" || astorApp == null) {
+    if (ajaxContainer == "" || astorApp == null) {
       redraw=true;
       return AstorApp.fromJson(json);
     } else {
@@ -241,7 +243,7 @@ class AstorProvider with ChangeNotifier {
   String toUrl(Map<String, String> form) {
     String output = "";
     form.forEach((key, value) {
-      output += value == null ? "" : ((output == "") ? "" : "&") + key + "=" +
+      output += ((output == "") ? "" : "&") + key + "=" +
           Uri.encodeComponent(value);
     });
 
@@ -250,32 +252,30 @@ class AstorProvider with ChangeNotifier {
 
   void addLoginParameters(Map<String, String> param, zUrl,
       BuildContext context) {
-    String newConf = 'pw=' + MediaQuery
+    String newConf = 'pw=${MediaQuery
         .of(context)
         .size
         .width
-        .toInt()
-        .toString() + ',ph=' + MediaQuery
+        .toInt()},ph=${MediaQuery
         .of(context)
         .size
         .height
-        .toInt()
-        .toString();
-    if (zUrl == 'do-login')
-      newConf += ',sw=' + MediaQuery
+        .toInt()}';
+    if (zUrl == 'do-login') {
+      newConf += ',sw=${MediaQuery
           .of(context)
           .size
           .width
-          .toInt()
-          .toString() + ',sh=' + MediaQuery
+          .toInt()},sh=${MediaQuery
           .of(context)
           .size
           .height
-          .toInt()
-          .toString();
+          .toInt()}';
+    }
     mainForm['dg_client_conf'] = newConf;
-    if (astorApp != null)
+    if (astorApp != null) {
       mainForm['subsession'] = astorApp!.subsession;
+    }
   }
 
   // void addFormLovParameters(Map<String,String> param,String zUrl) {
@@ -309,8 +309,8 @@ class AstorProvider with ChangeNotifier {
     String zAjaxContainer = comp.ajaxContainer;
     String specialselector = comp.specialSelector;
     String contextobj = comp.contextId;
-    String? sTheObjectResolveString = null;
-    String? zObjectOwnerDest = null;
+    String? sTheObjectResolveString;
+    String? zObjectOwnerDest;
     String? sMultipleOwnerList = "";
     bool bHasMultipleOwner = false;
     String? zCellSelect = "";
@@ -325,16 +325,16 @@ class AstorProvider with ChangeNotifier {
     //   zObjectSelectId = zObjectOwnerId; // listener
     //   zObjectOwnerId = objectDrop; // drop
     // } else
-    if (zTheObjectResolveString != "" && zTheObjectResolveString.length > 0) {
+    if (zTheObjectResolveString != "" && zTheObjectResolveString.isNotEmpty) {
       sTheObjectResolveString = zTheObjectResolveString;
     } else {
       sTheObjectResolveString = '';
-      if (zActionOwnerProvider != "" && zActionOwnerProvider.length > 0) {
+      if (zActionOwnerProvider != "" && zActionOwnerProvider.isNotEmpty) {
         Widget? oProvider = astorApp!.getObjectProvider(zActionOwnerProvider);
         // alert("getObjectProvider="+oProvider);
         if (oProvider != null && (oProvider is InterfaceProvider)) {
           InterfaceProvider oProviderList = oProvider as InterfaceProvider;
-          if (specialselector != null && specialselector != '') {
+          if (specialselector != '') {
             zObjectOwnerId = oProviderList.getCurrentActionOwnerFromSelect();
             sMultipleOwnerList =
                 oProviderList.getSelectionSpecial(specialselector);
@@ -348,11 +348,8 @@ class AstorProvider with ChangeNotifier {
             bHasMultipleOwner = oProviderList.hasMultipleSelect();
             zClearSelection = oProviderList.getClearSelection() ? "1" : "0";
           } else {
-            zObjectOwnerId =
-            (zObjectOwnerId != '') ? zObjectOwnerId : oProviderList
-                .getCurrentActionOwner();
-            zObjectOwnerDest =
-                oProviderList.getMultipleCurrentActionOwnerDest();
+            zObjectOwnerId = (zObjectOwnerId != '') ? zObjectOwnerId : oProviderList.getCurrentActionOwner();
+            zObjectOwnerDest = oProviderList.getMultipleCurrentActionOwnerDest();
             sMultipleOwnerList = oProviderList.getMultipleActionOwnerList();
             bHasMultipleOwner = oProviderList.hasMultipleSelect();
             zClearSelection = oProviderList.getClearSelection() ? "1" : "0";
@@ -361,13 +358,13 @@ class AstorProvider with ChangeNotifier {
           zRowSelect = oProviderList.getSelectedRow();
           zCellSelect = oProviderList.getSelectedCell();
           if (isWinDependant(zUrl) && zObjectOwnerId == null) {
-            throw new Exception("seleccionar una fila");
+            throw Exception("seleccionar una fila");
           }
         }
       } else {
-        if (zUrl!.indexOf('do-SwapListRefreshAction') != -1 ||
-            zUrl.indexOf('do-WinListRefreshAction') != -1 ||
-            zUrl.indexOf('do-WinListExpandAction') != -1) {
+        if (zUrl!.contains('do-SwapListRefreshAction') ||
+            zUrl.contains('do-WinListRefreshAction') ||
+            zUrl.contains('do-WinListExpandAction')) {
           Widget? oProvider = astorApp!.getObjectProvider(zActionOwnerProvider);
           if (oProvider != null && (oProvider is InterfaceProvider)) {
             InterfaceProvider oProviderList = oProvider as InterfaceProvider;
@@ -380,33 +377,33 @@ class AstorProvider with ChangeNotifier {
         }
       }
     }
-    if (zUrl!.indexOf('do-PartialRefreshForm') != -1) {
+    if (zUrl!.contains('do-PartialRefreshForm')) {
       mainForm['dg_source_control_id'] = comp.name;
     }
     mainForm['is_modal'] = "N";
     mainForm['dg_act_owner'] = sTheObjectResolveString;
-    mainForm['dg_action'] = zIdAction == null ? "" : zIdAction;
-    mainForm['dg_object_owner'] = zObjectOwnerId == null ? "" : zObjectOwnerId;
+    mainForm['dg_action'] = zIdAction ?? "";
+    mainForm['dg_object_owner'] = zObjectOwnerId ?? "";
     mainForm['dg_object_owner_dest'] =
-    zObjectOwnerDest == null ? "" : zObjectOwnerDest;
-    mainForm['dg_object_owner_context'] = contextobj == null ? "" : contextobj;
+    zObjectOwnerDest ?? "";
+    mainForm['dg_object_owner_context'] = contextobj ?? "";
     mainForm['dg_object_select'] =
-    zObjectSelectId == null ? "" : zObjectSelectId;
+    zObjectSelectId ?? "";
     mainForm['dg_clear_select'] =
-    zClearSelection == null ? "false" : zClearSelection;
+    zClearSelection ?? "false";
     mainForm['dg_table_provider'] =
-    zActionOwnerProvider == null ? "" : zActionOwnerProvider;
-    mainForm['dg_cell_select'] = zCellSelect == null ? "" : zCellSelect;
-    mainForm['dg_row_select'] = zRowSelect == null ? "" : zRowSelect;
+    zActionOwnerProvider ?? "";
+    mainForm['dg_cell_select'] = zCellSelect ?? "";
+    mainForm['dg_row_select'] = zRowSelect ?? "";
     mainForm['dg_multiple_owner_list'] =
-    sMultipleOwnerList == null ? "" : sMultipleOwnerList;
+    sMultipleOwnerList ?? "";
     mainForm['dg_is_multiple_owner'] = (bHasMultipleOwner ? "true" : "false");
-    mainForm['dg_scroller'] = sScroller == null ? "" : sScroller;
+    mainForm['dg_scroller'] = sScroller ?? "";
     mainForm['dg_back_modal'] = "N";
     mainForm['dg_extra_form_data'] =
-        "embedded=" + (embedded ? "true" : "false");
+        "embedded=${embedded ? "true" : "false"}";
     mainForm['dg_stadistics'] = "";
-    mainForm['dg_ajaxcontainer'] = zAjaxContainer == null ? "" : zAjaxContainer;
+    mainForm['dg_ajaxcontainer'] = zAjaxContainer ?? "";
     mainForm['dg_url'] = url;
   }
 
@@ -442,7 +439,7 @@ class AstorProvider with ChangeNotifier {
   }
 
 
-  isAjaxSubmit(zUrl) {
+  bool isAjaxSubmit(zUrl) {
     //alert("testing is ajax submit");
     if (zUrl.indexOf("do-WinListRefreshAction") == 0) {
       //alert("is Submit WinListRefresh");
@@ -483,8 +480,8 @@ class AstorProvider with ChangeNotifier {
 
 
   Future<List<AstorItem>?>? winLovOpen(AstorCombo combo, String search) {
-    Map<String, dynamic> parameters = Map<String, dynamic>();
-    Map<String, String> params = Map<String, String>();
+    Map<String, dynamic> parameters = <String, dynamic>{};
+    Map<String, String> params = <String, String>{};
 
     String listFilter = "";
     String url = combo.searchUrl;
@@ -502,14 +499,14 @@ class AstorProvider with ChangeNotifier {
       "dg_source_control_id": combo.name,
       "dg_partial_info": 'S',
       "search": search,
-      combo.name + "_text": search,
+      "${combo.name}_text": search,
       "type": 'public'
     };
 
     parameters = getMap(astorApp!.application_views, true);
 
     String nextUrl = "";
-    nextUrl += "/" + url;
+    nextUrl += "/$url";
     params.addAll(mainForm);
     toParams(params, parameters);
     toParams(params, cfg);

@@ -26,7 +26,7 @@ class JSONDiv extends StatelessWidget {
   final bool actionBar;
 
   const JSONDiv({
-    Key? key,
+    super.key,
     required this.schema,
     required this.onBuildBody,
     this.values,
@@ -38,7 +38,7 @@ class JSONDiv extends StatelessWidget {
     this.onFileUpload,
     this.useBootstrap = true,
     this.actionBar = false,
-  }) : super(key: key);
+  });
 
   BoxDecoration? getResponsiveBoxDecoration() {
     String pos = "";
@@ -48,23 +48,23 @@ class JSONDiv extends StatelessWidget {
     if (pos == "") return null;
     List<String> commands = pos.split(" ");
     for (String command in commands) {
-      if (command.indexOf("panel-") == -1)
+      if (!command.contains("panel-")) {
         continue;
-      else if (command.indexOf("-heading") != -1)
+      } else if (command.contains("-heading"))
         fill = Colors.black12;
-      else if (command.indexOf("-footer") != -1)
+      else if (command.contains("-footer"))
         fill = Colors.black12;
-      else if (command.indexOf("-primary") != -1)
+      else if (command.contains("-primary"))
         border = Colors.blue;
-      else if (command.indexOf("-default") != -1)
+      else if (command.contains("-default"))
         border = Colors.black12;
-      else if (command.indexOf("-danger") != -1)
+      else if (command.contains("-danger"))
         border = Colors.red;
-      else if (command.indexOf("-warning") != -1)
+      else if (command.contains("-warning"))
         border = Colors.yellow;
-      else if (command.indexOf("-success") != -1)
+      else if (command.contains("-success"))
         border = Colors.green;
-      else if (command.indexOf("-info") != -1) border = Colors.lightBlueAccent;
+      else if (command.contains("-info")) border = Colors.lightBlueAccent;
     }
     if (border != null && fill != null) {
       return BoxDecoration(color: fill, border: Border.all(color: border));
@@ -87,11 +87,12 @@ class JSONDiv extends StatelessWidget {
     if (pos == "") return "";
     List<String> commands = pos.split(" ");
     for (String command in commands) {
-      if (command.indexOf("col-") != -1 && command.indexOf("offset") == -1) {
-        if (command.indexOf("col-xs-")!=-1) {
-          out += command + " col-"+command.replaceAll(new RegExp(r'[^0-9]'), '')+" ";
-        } else
-          out += command + " ";
+      if (command.contains("col-") && !command.contains("offset")) {
+        if (command.contains("col-xs-")) {
+          out += "$command col-${command.replaceAll(new RegExp(r'[^0-9]'), '')} ";
+        } else {
+          out += "$command ";
+        }
       }
     }
     return out;
@@ -104,48 +105,55 @@ class JSONDiv extends StatelessWidget {
     if (pos == "") return "";
     List<String> commands = pos.split(" ");
     for (String command in commands) {
-      if (command.indexOf("offset") == -1) continue;
+      if (!command.contains("offset")) continue;
       out += " offset-";
-      if (command.indexOf("-xs-") != -1)
+      if (command.contains("-xs-")) {
         out += "xs-";
-      else if (command.indexOf("-sm-") != -1)
+      } else if (command.contains("-sm-"))
         out += "sm-";
-      else if (command.indexOf("-md-") != -1)
+      else if (command.contains("-md-"))
         out += "md-";
-      else if (command.indexOf("-lg-") != -1)
+      else if (command.contains("-lg-"))
         out += "lg-";
-      else if (command.indexOf("-xl-") != -1) out += "xl-";
-      out += command.replaceAll(new RegExp(r'[^0-9]'), '');
+      else if (command.contains("-xl-")) out += "xl-";
+      out += command.replaceAll(RegExp(r'[^0-9]'), '');
     }
     return out;
   }
 
   bool isAlignRight(AstorComponente comp) {
-    if ((comp.classResponsive.indexOf("text-right") != -1))
+    if ((comp.classResponsive.contains("text-right"))) {
       return true;
-    if ((comp.classResponsive.indexOf("one-line-right") != -1))
+    }
+    if ((comp.classResponsive.contains("one-line-right"))) {
       return true;
-    if ((comp.classResponsive.indexOf("pull-right") != -1))
+    }
+    if ((comp.classResponsive.contains("pull-right"))) {
       return true;
+    }
     return false;
   }
 
   bool isAlignLeft(AstorComponente comp) {
-     if ((comp.classResponsive.indexOf("text-left") != -1))
+     if ((comp.classResponsive.contains("text-left"))) {
+       return true;
+     }
+    if ((comp.classResponsive.contains("pull-left"))) {
       return true;
-    if ((comp.classResponsive.indexOf("pull-left") != -1))
-      return true;
+    }
     return false;
   }
 
   bool isFull(AstorComponente comp) {
     if (comp is AstorList) return true;
     if (comp is AstorTabPanel) return true;
-    if ((comp.classResponsive.indexOf("btn-block") != -1))
+    if ((comp.classResponsive.contains("btn-block"))) {
       return true;
-    if ((comp.classTableResponsive.indexOf("table") != -1))
+    }
+    if ((comp.classTableResponsive.contains("table"))) {
       return true;
-    if ((comp.classResponsive.indexOf("pagination") != -1)) {
+    }
+    if ((comp.classResponsive.contains("pagination"))) {
       return true;
 
     }
@@ -153,28 +161,34 @@ class JSONDiv extends StatelessWidget {
     return false;
   }
   bool isFormFilter(AstorComponente comp) {
-    if ((comp.classResponsive.indexOf("form-filter") != -1)) {
+    if ((comp.classResponsive.contains("form-filter"))) {
       return true;
     }
     return false;
   }
 
   Color? getColorBorder(AstorComponente comp) {
-    if ((comp.classResponsive.indexOf("btn") == -1)&&(comp.classResponsive.indexOf("border") == -1)) {
+    if ((!comp.classResponsive.contains("btn"))&&(!comp.classResponsive.contains("border"))) {
       return null;
     }
-    if (comp.classResponsive.indexOf("btn-primary") != -1 || comp.classResponsive.indexOf("border-primary") != -1)
+    if (comp.classResponsive.contains("btn-primary") || comp.classResponsive.contains("border-primary")) {
       return Colors.blue;
-    if (comp.classResponsive.indexOf("btn-default") != -1 || comp.classResponsive.indexOf("border-default") != -1)
+    }
+    if (comp.classResponsive.contains("btn-default") || comp.classResponsive.contains("border-default")) {
       return Colors.black45;
-    if (comp.classResponsive.indexOf("btn-danger") != -1 || comp.classResponsive.indexOf("border-danger") != -1)
+    }
+    if (comp.classResponsive.contains("btn-danger") || comp.classResponsive.contains("border-danger")) {
       return Colors.red;
-    if (comp.classResponsive.indexOf("btn-warning") != -1 || comp.classResponsive.indexOf("border-warning") != -1)
-     return Colors.yellow;
-    if (comp.classResponsive.indexOf("btn-success") != -1 || comp.classResponsive.indexOf("border-success") != -1)
-     return Colors.green;
-    if (comp.classResponsive.indexOf("btn-info") != -1 || comp.classResponsive.indexOf("border-info") != -1)
+    }
+    if (comp.classResponsive.contains("btn-warning") || comp.classResponsive.contains("border-warning")) {
+      return Colors.yellow;
+    }
+    if (comp.classResponsive.contains("btn-success") || comp.classResponsive.contains("border-success")) {
+      return Colors.green;
+    }
+    if (comp.classResponsive.contains("btn-info") || comp.classResponsive.contains("border-info")) {
       return Colors.lightBlueAccent;
+    }
     return null;
   }
 
@@ -203,19 +217,22 @@ class JSONDiv extends StatelessWidget {
     return addAlignDiv(context);
   }
   Widget addAlignDiv(BuildContext context) {
-    if (isAlignRight(schema))
+    if (isAlignRight(schema)) {
       return Align(
         alignment: Alignment.topRight,
         child: addDiv(context,true,WrapAlignment.end,MainAxisAlignment.end),
       );
-    if (isAlignLeft(schema))
+    }
+    if (isAlignLeft(schema)) {
       return Align(
         alignment: Alignment.topLeft,
         child: addDiv(context,true,WrapAlignment.start,MainAxisAlignment.start),
       );
-    if (isFull(schema))
+    }
+    if (isFull(schema)) {
       return Padding(padding: const EdgeInsets.only(left: 20, right: 20,),
           child: addDiv(context,false,null,MainAxisAlignment.spaceEvenly));
+    }
     return addDiv(context,false,WrapAlignment.center,MainAxisAlignment.center);
 
   }
@@ -241,7 +258,7 @@ class JSONDiv extends StatelessWidget {
             )
         ],
       );
-    } else if (actionBar) return ButtonBar(
+    } else if (actionBar) return OverflowBar(
         alignment: aligmentBar,
         children: [
           for (AstorComponente schema in schemaList.where((element) =>
@@ -269,19 +286,22 @@ class JSONDiv extends StatelessWidget {
     return addComponentInternal(comp,context);
   }
   Widget addAlignComponentInternal(AstorComponente comp, BuildContext context) {
-    if (isAlignRight(comp))
+    if (isAlignRight(comp)) {
       return Align(
         alignment: Alignment.topRight,
         child: addWidthComponentInternal(comp,context),
       );
-    if (isAlignLeft(comp))
+    }
+    if (isAlignLeft(comp)) {
       return Align(
         alignment: Alignment.topLeft,
         child: addWidthComponentInternal(comp,context),
       );
-    if (isFull(comp))
+    }
+    if (isFull(comp)) {
       return Padding(padding: const EdgeInsets.only(left: 20, right: 20,),
           child: addWidthComponentInternal(comp,context));
+    }
     return addWidthComponentInternal(comp, context);
 
   }

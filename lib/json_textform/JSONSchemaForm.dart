@@ -62,7 +62,7 @@ class JSONSchemaForm extends StatelessWidget {
   final String url;
 
   const JSONSchemaForm({
-    Key? key,
+    super.key,
     required this.schema,
     this.onSubmit,
     this.icons,
@@ -74,7 +74,7 @@ class JSONSchemaForm extends StatelessWidget {
     this.onFileUpload,
     this.onSearch,
     this.loadingDialog,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

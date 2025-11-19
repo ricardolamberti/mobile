@@ -15,7 +15,7 @@ class SelectionPage extends StatefulWidget {
   final List<AstorItem>? value;
 
   const SelectionPage({
-    Key? key,
+    super.key,
     required this.onSearch,
     required this.selections,
     required this.multiple,
@@ -24,7 +24,7 @@ class SelectionPage extends StatefulWidget {
     required this.useDialog,
     required this.schema,
     this.value,
-  }) : super(key: key);
+  });
 
   @override
   _SelectionPageState createState() => _SelectionPageState();
@@ -191,10 +191,10 @@ class _SelectionPageState extends State<SelectionPage> {
               label: Text(selected.descripcion),
               icon: const Icon(Icons.highlight_remove_sharp),
               style: ButtonStyle(
-                padding: MaterialStateProperty.all<EdgeInsets>(
+                padding: WidgetStateProperty.all<EdgeInsets>(
                   const EdgeInsets.all(15),
                 ),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     side: const BorderSide(color: Colors.blue),

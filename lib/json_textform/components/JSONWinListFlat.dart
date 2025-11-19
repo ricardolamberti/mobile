@@ -25,15 +25,15 @@ class JSONWinListFlat extends StatefulWidget implements InterfaceProvider {
   /// indica si hay que limpiar la selección actual
   final bool clearSelection;
 
-  JSONWinListFlat({
-    Key? key,
+  const JSONWinListFlat({
+    super.key,
     required this.schema,
     required this.onBuildBody,
     required this.onPressed,
     this.onSaved,
     this.isMultiple = false,
     this.clearSelection = false,
-  }) : super(key: key);
+  });
 
   @override
   _JSONWinListFlatState createState() => _JSONWinListFlatState();
