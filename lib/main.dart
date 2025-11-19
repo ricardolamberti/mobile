@@ -26,6 +26,10 @@ class AstorSkin {
   final double buttonRadius;
   final String? fontFamily;
 
+  // Extras del backend
+  final String? basePath;
+  final String? urlPrefix;
+
   const AstorSkin({
     required this.primaryColor,
     required this.backgroundColor,
@@ -34,20 +38,102 @@ class AstorSkin {
     required this.inputFillColor,
     required this.buttonRadius,
     this.fontFamily,
+    this.basePath,
+    this.urlPrefix,
   });
 
   factory AstorSkin.fromJson(Map<String, dynamic> json) {
     final defaults = AstorSkin.defaultSkin();
-    final rawFont = json['fontFamily'] as String?;
-    final trimmedFont = rawFont?.trim();
+
+    // Si viene como {"skin": {...}} lo tomamos de ahí
+    final Map<String, dynamic> skin =
+    (json['skin'] is Map<String, dynamic>) ? json['skin'] as Map<String, dynamic> : json;
+
+    // ---------- base_path y url_prefix ----------
+    final String? basePath = skin['base_path'] as String?;
+    final String? urlPrefix = skin['url_prefix'] as String?;
+
+    // ---------- palettes ----------
+    final palettesRaw = skin['palettes'];
+    Map<String, dynamic> selectedPalette = {};
+
+    if (palettesRaw is Map<String, dynamic> && palettesRaw.isNotEmpty) {
+      selectedPalette =
+          (palettesRaw['light'] as Map<String, dynamic>?) ??
+              (palettesRaw['default'] as Map<String, dynamic>?) ??
+              (palettesRaw.values.first as Map<String, dynamic>);
+    }
+
+    final String? primaryHex =
+    _tryGetString(selectedPalette, ['primary', 'primaryColor', 'primary_color']);
+    final String? backgroundHex =
+    _tryGetString(selectedPalette, ['background', 'backgroundColor', 'surface']);
+    final String? inputFillHex =
+    _tryGetString(selectedPalette, ['surface', 'background']);
+
+    // ---------- shapes ----------
+    final shapesRaw = skin['shapes'];
+    Map<String, dynamic>? cardShape;
+    Map<String, dynamic>? buttonShape;
+    if (shapesRaw is Map<String, dynamic>) {
+      cardShape = shapesRaw['card'] as Map<String, dynamic>?;
+      buttonShape = shapesRaw['button'] as Map<String, dynamic>?;
+    }
+
+    final double cardRadius =
+        _tryParseDouble(cardShape?['cornerRadius']) ?? defaults.cardRadius;
+    final double buttonRadius =
+        _tryParseDouble(buttonShape?['cornerRadius']) ?? defaults.buttonRadius;
+
+    // ---------- elevations ----------
+    final elevationsRaw = skin['elevations'];
+    final double cardElevation = _tryParseDouble(
+      (elevationsRaw is Map<String, dynamic>)
+          ? elevationsRaw['medium']
+          : null,
+    ) ??
+        defaults.cardElevation;
+
+    // ---------- typography / fontFamily ----------
+    String? fontFamily;
+    final typography = skin['typography'];
+    if (typography is Map<String, dynamic>) {
+      final fonts = typography['fonts'];
+      if (fonts is List) {
+        Map<String, dynamic>? defaultFont;
+
+        for (final f in fonts) {
+          if (f is Map<String, dynamic>) {
+            final def = (f['default'] as String?)?.toLowerCase() == 'true';
+            if (def) {
+              defaultFont = f;
+              break;
+            }
+          }
+        }
+
+        defaultFont ??= fonts.firstWhere(
+              (f) => f is Map<String, dynamic>,
+          orElse: () => null,
+        ) as Map<String, dynamic>?;
+
+        fontFamily = defaultFont?['name'] as String?;
+      }
+    }
+
+    final cleanedFont =
+    (fontFamily != null && fontFamily.trim().isNotEmpty) ? fontFamily.trim() : defaults.fontFamily;
+
     return AstorSkin(
-      primaryColor: _parseHexColor(json['primaryColor'] as String?) ?? defaults.primaryColor,
-      backgroundColor: _parseHexColor(json['backgroundColor'] as String?) ?? defaults.backgroundColor,
-      cardRadius: (json['cardRadius'] as num?)?.toDouble() ?? defaults.cardRadius,
-      cardElevation: (json['cardElevation'] as num?)?.toDouble() ?? defaults.cardElevation,
-      inputFillColor: _parseHexColor(json['inputFillColor'] as String?) ?? defaults.inputFillColor,
-      buttonRadius: (json['buttonRadius'] as num?)?.toDouble() ?? defaults.buttonRadius,
-      fontFamily: trimmedFont == null || trimmedFont.isEmpty ? defaults.fontFamily : trimmedFont,
+      primaryColor: _parseHexColor(primaryHex) ?? defaults.primaryColor,
+      backgroundColor: _parseHexColor(backgroundHex) ?? defaults.backgroundColor,
+      cardRadius: cardRadius,
+      cardElevation: cardElevation,
+      inputFillColor: _parseHexColor(inputFillHex) ?? defaults.inputFillColor,
+      buttonRadius: buttonRadius,
+      fontFamily: cleanedFont,
+      basePath: basePath,
+      urlPrefix: urlPrefix,
     );
   }
 
@@ -60,22 +146,52 @@ class AstorSkin {
       inputFillColor: Colors.white,
       buttonRadius: 12,
       fontFamily: null,
+      basePath: null,
+      urlPrefix: null,
     );
   }
 }
+/// Helper para leer una string probando varias keys posibles
+String? _tryGetString(Map<String, dynamic> map, List<String> keys) {
+  for (final k in keys) {
+    final v = map[k];
+    if (v is String && v.trim().isNotEmpty) return v.trim();
+  }
+  return null;
+}
+/// Helper para leer una string probando varias keys posibles
+String _buildSkinUrl() {
+  final baseUrl = dotenv.env['URL'] ?? '';
+  if (baseUrl.isEmpty) return '';
 
+  final normalizedBase =
+  baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+
+  // Este path tiene que matchear el <map:match pattern="..."> del sitemap
+  return '$normalizedBase/mobile-skin';
+}
+
+double? _tryParseDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
+}
+
+/// Acepta "#RRGGBB", "#AARRGGBB", "RRGGBB", "AARRGGBB"
 Color? _parseHexColor(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   var cleaned = hex.replaceAll('#', '').trim();
+
   if (cleaned.length == 6) {
     cleaned = 'FF$cleaned';
   }
   if (cleaned.length != 8) return null;
+
   final intColor = int.tryParse(cleaned, radix: 16);
   if (intColor == null) return null;
   return Color(intColor);
 }
-
 ThemeData buildThemeFromSkin(AstorSkin skin) {
   final base = ThemeData(
     useMaterial3: true,
@@ -94,12 +210,12 @@ ThemeData buildThemeFromSkin(AstorSkin skin) {
       elevation: 0,
       centerTitle: true,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Colors.white,
-      elevation: skin.cardElevation,
+      elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(skin.cardRadius),
+        borderRadius: BorderRadius.circular(16),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -139,21 +255,31 @@ ThemeData buildThemeFromSkin(AstorSkin skin) {
   );
 }
 
+
+
+
 Future<AstorSkin> loadSkinFromBackend() async {
   final defaultSkin = AstorSkin.defaultSkin();
-  final skinUrl = dotenv.env['SKIN_URL'];
-  if (skinUrl == null || skinUrl.isEmpty) {
+  final skinUrl = _buildSkinUrl();
+
+  if (skinUrl.isEmpty) {
     return defaultSkin;
   }
+
   try {
-    final response = await http.get(Uri.parse(skinUrl));
+    final uri = Uri.parse(skinUrl);
+    final response = await http.get(uri);
+
     if (response.statusCode == 200) {
-      final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
-      return AstorSkin.fromJson(jsonMap);
+      final dynamic decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        return AstorSkin.fromJson(decoded);
+      }
     }
-  } catch (_) {
-    // Ignore and fall back to defaults
+  } catch (e) {
+     print("Error cargando skin: $e");
   }
+
   return defaultSkin;
 }
 

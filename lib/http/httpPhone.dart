@@ -84,7 +84,15 @@ class AstorWebHttpPhone extends AstorWebHttp {
   // ---------------------------------------------------------------------------
   // HELPERS DE COOKIES
   // ---------------------------------------------------------------------------
-
+  void logLong(String label, String text) {
+    const int chunkSize = 800; // ajustá si querés más chico/grande
+    debugPrint('===== $label (len=${text.length}) =====');
+    for (var i = 0; i < text.length; i += chunkSize) {
+      final end = (i + chunkSize < text.length) ? i + chunkSize : text.length;
+      debugPrint(text.substring(i, end));
+    }
+    debugPrint('===== END $label =====');
+  }
   /// Parsea un header Set-Cookie (que puede traer 1 o varias cookies) y las guarda en `_cookies`.
   void _parseAndStoreCookies(String setCookieHeader) {
     // OJO: esto es simplificado; si tu backend usa `Expires=Wed, 01 Jan 2025 ...`
@@ -204,9 +212,11 @@ class AstorWebHttpPhone extends AstorWebHttp {
     this.doDownload = doDownload;
   }
   dynamic _decodeJsonBody(http.Response response) {
-    // <<<
     final bodyStr = const Utf8Decoder().convert(response.bodyBytes);
-    debugPrint(bodyStr, wrapWidth: 200000);
+
+    // 🔍 log completo, sin truncar
+    logLong('RAW RESPONSE ${response.request?.url}', bodyStr);
+    saveLastResponseToFile(bodyStr);
 
     final trimmed = bodyStr.trimLeft();
 
@@ -219,11 +229,20 @@ class AstorWebHttpPhone extends AstorWebHttp {
     }
 
     try {
-      return jsonDecode(trimmed);
+      final decoded = jsonDecode(trimmed);
+
+      // Opcional: pretty-print del JSON, también chunked
+      final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
+      logLong('JSON DECODED ${response.request?.url}', pretty);
+
+      return decoded;
     } catch (e) {
-      throw Exception('Error al parsear JSON: $e\nBody: $trimmed');
+      // Si falla, logueo de nuevo lo que intenté parsear
+      logLong('JSON PARSE ERROR BODY', trimmed);
+      throw Exception('Error al parsear JSON: $e');
     }
   }
+
 
   // --- requests --------------------------------------------------------- //
 
@@ -382,7 +401,16 @@ class AstorWebHttpPhone extends AstorWebHttp {
   }
 
   // --- procesamiento de respuestas -------------------------------------- //
-
+  Future<void> saveLastResponseToFile(String content) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/last_response.json');
+      await file.writeAsString(content);
+      debugPrint('💾 JSON guardado en: ${file.path}');
+    } catch (e) {
+      debugPrint('Error guardando JSON en archivo: $e');
+    }
+  }
   Future<AstorApp> processResponse(http.Response response) async {
     if (isDownloadFile(response)) {
       return processDownloadResponse(response);
