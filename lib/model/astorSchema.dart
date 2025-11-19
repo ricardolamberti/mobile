@@ -1103,6 +1103,31 @@ class AstorComponente {
   String get classResponsive =>  attributes['class_responsive']==null?'':attributes['class_responsive']!;
   String get classTableResponsive =>  attributes['class_table_responsive']==null?'':attributes['class_table_responsive']!;
   String get fullClassResponsive =>  attributes['size_responsive']==null?classResponsive:sizeResponsive;
+  bool get isFilterForm {
+    if (type != 'form_responsive') {
+      return false;
+    }
+    final classes = classResponsive.trim();
+    if (classes.isEmpty) {
+      return false;
+    }
+    return classes
+        .split(RegExp(r'\s+'))
+        .any((cls) => cls.trim() == 'form-filter');
+  }
+
+  bool hasCssClass(String cls) {
+    if (cls.isEmpty) {
+      return false;
+    }
+    final classes = classResponsive.trim();
+    if (classes.isEmpty) {
+      return false;
+    }
+    return classes
+        .split(RegExp(r'\s+'))
+        .any((c) => c.trim() == cls);
+  }
   bool get hasMoreSelection =>  attributes['has_more_selection']==null?false:attributes['has_more_selection']=="true";
   String get ajaxContainer =>  attributes['action_ajax_container']==null?'':attributes['action_ajax_container']!;
   bool get refreshForm =>  attributes['refreshForm']==null?false:attributes['refreshForm']=="true";

@@ -20,6 +20,7 @@ import 'components/JSONActionBar.dart';
 import 'components/JSONButton.dart';
 import 'components/JSONCard.dart';
 import 'components/JSONColor.dart';
+import 'components/astor_filter_and_list.dart';
 import 'components/JSONDropDownButton.dart';
 import 'components/JSONFieldset.dart';
 import 'components/JSONIcon.dart';
@@ -217,6 +218,12 @@ class _JSONSchemaFormState extends State<JSONForm> {
 
   /// Render body widget based on widget type
   Widget _buildBodyChild(AstorComponente schema) {
+    if (_shouldRenderFilterAndList(schema)) {
+      return AstorFilterAndList(
+        zoneRow: schema,
+        onBuildBody: _buildBodyChild,
+      );
+    }
     final widgetType = schema.widget;
     if (widgetType == null) {
       return const SizedBox.shrink();
@@ -608,6 +615,27 @@ class _JSONSchemaFormState extends State<JSONForm> {
     } catch (err) {
       rethrow;
     }
+  }
+
+  bool _shouldRenderFilterAndList(AstorComponente schema) {
+    if (schema.type != 'zone_row') {
+      return false;
+    }
+    if (!schema.name.toLowerCase().contains('win_list_complete')) {
+      return false;
+    }
+    final hasFilter = schema.components.any((c) => c.isFilterForm);
+    final hasList = schema.components.any(_isListComponent);
+    return hasFilter && hasList;
+  }
+
+  bool _isListComponent(AstorComponente component) {
+    final type = component.type;
+    final name = component.name.toLowerCase();
+    return name.contains('_list_pane') ||
+        type == 'dgf_list_responsive' ||
+        type == 'dgf_list_mobile' ||
+        type.contains('list_responsive');
   }
 
   void onPressSubmitButton(AstorComponente schema, [BuildContext? ctx]) async {
