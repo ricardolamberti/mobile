@@ -10,14 +10,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e4b8c947-37f3-46e6-b0e5-f47d7957baff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/json_textform/components/pages/astor_input_decoration.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/astormobile.iml" beforeDir="false" afterPath="$PROJECT_DIR$/astormobile.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/config.env" beforeDir="false" afterPath="$PROJECT_DIR$/assets/config.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/astorScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/astorScreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/http/httpPhone.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/http/httpPhone.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/json_textform/JSONForm.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/JSONForm.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONActionBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONActionBar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONDateTimeField.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONDateTimeField.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONLabel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONLabel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONSelectField.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONSelectField.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/astor_filter_and_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/astor_filter_and_list.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/model/astorSchema.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/astorSchema.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONTextFormField.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONTextFormField.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -52,6 +56,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -70,7 +77,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Flutter.main.dart.executor": "Debug",
+    "Flutter.main.dart.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -82,6 +89,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "io.flutter.project.isFirstOpen": "true",
+    "io.flutter.reload.alreadyRun": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/dev/astorMobileV2/mobile",
     "settings.editor.selected.configurable": "AndroidSdkUpdater",

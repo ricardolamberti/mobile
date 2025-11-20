@@ -174,21 +174,37 @@ class _JSONSelectFieldState extends State<JSONSelectField> {
   // ----------------------------------------------------------------------
   //  READ ONLY
   // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+//  READ ONLY
+// ----------------------------------------------------------------------
   Widget buildReadOnly(bool visible, BuildContext context) {
+    final theme = Theme.of(context);
+    final baseDecoration = buildAstorInputDecoration(context, widget.schema);
+
     return Visibility(
       visible: visible,
-      child: Container(
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
         child: TextFormField(
           key: Key('textfield-${widget.schema.name}'),
           maxLines: 1,
-          enabled: false,
+          // 👇 se ve normal pero no se puede editar
+          enabled: true,
+          readOnly: true,
           initialValue: getDescripcion(),
-          decoration: buildAstorInputDecoration(context, widget.schema),
+          style: theme.textTheme.bodyMedium,
+          decoration: baseDecoration.copyWith(
+            // fondo suave para readonly, igual que en los otros campos
+            filled: true,
+            fillColor: theme.colorScheme.surfaceVariant,
+            // opcional: candadito para marcar que es solo lectura
+            suffixIcon: const Icon(Icons.lock_outline, size: 18),
+          ),
         ),
       ),
     );
   }
+
 
   // ----------------------------------------------------------------------
   //  LOV RESPONSIVE (win_lov_responsive)  -> campo editable + lista abajo

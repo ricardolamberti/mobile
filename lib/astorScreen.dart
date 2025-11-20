@@ -121,6 +121,30 @@ class _AstorScreenState extends State<AstorScreen> {
                     },
                   )
                 : Container(),
+      IconButton(
+        icon: const Icon(Icons.info_outline),
+        tooltip: 'Acerca de',
+        onPressed: () {
+          final appVersion = AppVersionInfo().version;
+          final buildNumber = AppVersionInfo().buildNumber;
+
+          final backendVersion =
+              widget.astorApp.application_version_info ?? '';
+          final backendRelease =
+              widget.astorApp.application_release_info ?? '';
+
+          showAboutDialog(
+            context: context,
+            applicationName: widget.astorApp.application_name,
+            applicationVersion: '$appVersion+$buildNumber',
+            children: [
+              if (backendVersion.isNotEmpty)
+                Text(backendVersion),
+              if (backendRelease.isNotEmpty)
+                Text(backendRelease),
+            ],
+          );
+        },)
           ],
         ),
         drawer: JSONActionBarSideBar(

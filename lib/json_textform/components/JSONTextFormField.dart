@@ -245,10 +245,20 @@ class _JSONTextFormFieldState extends State<JSONTextFormField> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final bool visible = widget.schema.visible;
     final bool edited = widget.schema.edited;
+    final bool isReadOnly = !edited;
     final lengthValidation = widget.schema.validation?.length;
+
+    // Sufijo: acción solo si es editable, candado si es solo lectura
+    Widget? suffix;
+    if (edited) {
+      suffix = _renderSuffixIcon();
+    } else {
+      suffix = const Icon(Icons.lock_outline, size: 18);
+    }
 
     return Visibility(
       visible: visible,
@@ -263,13 +273,20 @@ class _JSONTextFormFieldState extends State<JSONTextFormField> {
           key: Key('textfield-${widget.schema.name}'),
           maxLines: multiLine ? 10 : 1,
           controller: _controller,
-          enabled: edited,
+          // 👇 siempre enabled, pero readOnly cuando no se puede editar
+          enabled: true,
+          readOnly: isReadOnly,
           keyboardType: _getTextInputType(),
           validator: validation,
           maxLength: lengthValidation?.maximum,
           obscureText: widget.schema.type == 'password_field_responsive',
+          style: Theme.of(context).textTheme.bodyMedium, // texto normal, nada grisado
           decoration: InputDecoration(
-            filled: false,
+            // 👇 usar fondo suave para readonly
+            filled: true,
+            fillColor: isReadOnly
+                ? Theme.of(context).colorScheme.surfaceVariant
+                : Theme.of(context).inputDecorationTheme.fillColor,
             errorBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.red),
             ),
@@ -278,18 +295,20 @@ class _JSONTextFormFieldState extends State<JSONTextFormField> {
             prefixIcon: widget.schema.icon != null
                 ? Icon(widget.schema.icon!.iconData)
                 : null,
-            suffixIcon: _renderSuffixIcon(),
-            border: edited
-                ? const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5.0),
-                    ),
-                  )
-                : null,
+            suffixIcon: suffix,
+            // podés dejar que el border venga del theme,
+            // o forzarlo igual para ambos estados:
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
           ),
           onSaved: widget.onSaved,
         ),
       ),
     );
   }
+
+
 }

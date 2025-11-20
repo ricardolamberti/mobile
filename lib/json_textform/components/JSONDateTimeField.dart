@@ -127,6 +127,8 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
   }
 
   Widget addReadonly(bool visible, String format) {
+    final String value = widget.schema.value?.toString() ?? '';
+
     return Visibility(
       visible: visible,
       child: Padding(
@@ -134,11 +136,24 @@ class _JSONDateTimeFieldState extends State<JSONDateTimeField> {
         child: TextFormField(
           key: Key('textfield-${widget.schema.name}'),
           maxLines: 1,
-          enabled: false,
-          initialValue: widget.schema.value?.toString() ?? '',
+          // 👇 se ve normal, pero no se puede editar
+          enabled: true,
+          readOnly: true,
+          initialValue: value,
+          style: Theme.of(context).textTheme.bodyMedium,
           decoration: InputDecoration(
-            filled: false,
+            filled: true,
+            // 👇 fondo suave para readonly
+            fillColor: Theme.of(context).colorScheme.surfaceVariant,
             labelText: widget.schema.label,
+            prefixIcon: _buildPrefixIcon(),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
+            // 👇 opcional, igual que en los textos
+            suffixIcon: const Icon(Icons.lock_outline, size: 18),
           ),
         ),
       ),

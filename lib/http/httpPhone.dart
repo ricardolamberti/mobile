@@ -233,7 +233,7 @@ class AstorWebHttpPhone extends AstorWebHttp {
 
       // Opcional: pretty-print del JSON, también chunked
       final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
-     // logLong('JSON DECODED ${response.request?.url}', pretty);
+    //  logLong('JSON DECODED ${response.request?.url}', pretty);
 
       return decoded;
     } catch (e) {

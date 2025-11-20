@@ -16,6 +16,7 @@ import '/json_textform/models/Controller.dart';
 import '/json_textform/utils-components/pushNotification.dart';
 import '/model/AstorProvider.dart';
 import 'astorScreen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AstorSkin {
   final Color primaryColor;
@@ -287,6 +288,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await dotenv.load(fileName: "assets/config.env");
+  await AppVersionInfo().init(); // carga versión de la app
+
   getDeviceIdentifier();
 
   final skin = await loadSkinFromBackend();
@@ -441,6 +444,44 @@ class AstorErrorScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class AppVersionInfo {
+  static final AppVersionInfo _instance = AppVersionInfo._();
+  factory AppVersionInfo() => _instance;
+  AppVersionInfo._();
+
+  String version = '';
+  String buildNumber = '';
+
+  Future<void> init() async {
+    final info = await PackageInfo.fromPlatform();
+    version = info.version;       // ej: "1.0.3"
+    buildNumber = info.buildNumber; // ej: "45"
+  }
+}
+
+class AboutPanel extends StatelessWidget {
+  const AboutPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appVersion = AppVersionInfo().version;
+    final buildNumber = AppVersionInfo().buildNumber;
+
+    // Si ya tenés el AstorApp, podés sacar la version del backend también
+    // por ejemplo: astorApp.applicationVersionInfo
+    // (lo que viene de "application_version_info" del JSON) :contentReference[oaicite:1]{index=1}
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Versión app móvil: $appVersion+$buildNumber'),
+        // Text('Versión backend: ${astorApp.applicationVersionInfo}'),
+      ],
     );
   }
 }
