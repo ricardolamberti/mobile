@@ -10,11 +10,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e4b8c947-37f3-46e6-b0e5-f47d7957baff" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/json_textform/components/pages/astor_input_decoration.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/config.env" beforeDir="false" afterPath="$PROJECT_DIR$/assets/config.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astormobile.iml" beforeDir="false" afterPath="$PROJECT_DIR$/astormobile.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/http/httpPhone.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/http/httpPhone.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/JSONForm.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/JSONForm.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/JSONSelectField.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/JSONSelectField.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/json_textform/components/astor_filter_and_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/json_textform/components/astor_filter_and_list.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/astorSchema.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/astorSchema.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +41,14 @@
       </file>
     </leaf>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Dart File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -58,7 +70,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Flutter.main.dart.executor": "Run",
+    "Flutter.main.dart.executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -104,6 +116,11 @@
           <url>file://$PROJECT_DIR$/lib/json_textform/components/JSONCard.dart</url>
           <line>79</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/json_textform/components/JSONCheckboxField.dart</url>
+          <line>55</line>
+          <option name="timeStamp" value="38" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

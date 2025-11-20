@@ -222,6 +222,8 @@ class _JSONSchemaFormState extends State<JSONForm> {
       return AstorFilterAndList(
         zoneRow: schema,
         onBuildBody: _buildBodyChild,
+        onRefreshForm: onRefreshForm,
+
       );
     }
     final widgetType = schema.widget;
@@ -621,22 +623,49 @@ class _JSONSchemaFormState extends State<JSONForm> {
     if (schema.type != 'zone_row') {
       return false;
     }
-    if (!schema.name.toLowerCase().contains('win_list_complete')) {
+
+    final name = schema.name.toLowerCase();
+    if (!name.contains('win_list_complete')) {
       return false;
     }
-    final hasFilter = schema.components.any((c) => c.isFilterForm);
-    final hasList = schema.components.any(_isListComponent);
-    return hasFilter && hasList;
+
+    // Solo necesito saber si hay un form-filter en profundidad
+    final hasFilter = schema.anyDescendant((c) => c.isFilterForm);
+    if (!hasFilter) {
+      return false;
+    }
+
+    // La lista la detecto después dentro de AstorFilterAndList
+    return true;
   }
 
   bool _isListComponent(AstorComponente component) {
     final type = component.type;
-    final name = component.name.toLowerCase();
-    return name.contains('_list_pane') ||
-        type == 'dgf_list_responsive' ||
-        type == 'dgf_list_mobile' ||
-        type.contains('list_responsive');
+    final name = (component.name ?? '').toLowerCase();
+
+    // 1) Si es una lista/tablas procesada por AstorList / AstorTree
+    if (component is AstorList) {
+      final tableClass = component.classTableResponsive.toLowerCase();
+      // tu caso típico: "table  table-bordered"
+      if (tableClass.contains('table')) {
+        return true;
+      }
+    }
+
+    // 2) Por tipo crudo
+    if (type == 'win_list') return true;
+    if (type == 'tree_responsive') return true;
+
+    // 3) Heurísticas que ya tenías
+    if (name.contains('_list_pane')) return true;
+    if (type == 'dgf_list_responsive') return true;
+    if (type == 'dgf_list_mobile') return true;
+    if (type.contains('list_responsive')) return true;
+
+    return false;
   }
+
+
 
   void onPressSubmitButton(AstorComponente schema, [BuildContext? ctx]) async {
     if (isLoading) {

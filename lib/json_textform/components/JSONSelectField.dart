@@ -1,4 +1,5 @@
 import 'package:astor_mobile/json_textform/components/pages/NewPage.dart';
+import 'package:astor_mobile/json_textform/components/pages/astor_input_decoration.dart';
 import 'package:astor_mobile/model/AstorProvider.dart';
 import 'package:astor_mobile/model/astorSchema.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +12,11 @@ import 'JSONIcon.dart';
 
 typedef OnChange = void Function(List<AstorItem> choice);
 
-class JSONSelectField extends StatelessWidget implements InterfaceProvider {
+class JSONSelectField extends StatefulWidget implements InterfaceProvider {
   final AstorCombo schema;
   final OnChange? onSaved;
   final OnRefereshForm? onRefreshForm;
 
-  // ESTOS CAMPOS:
   final bool useDropdownButton;
   final bool useRadioButton;
   final bool useCheckButton;
@@ -29,79 +29,242 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
     required this.schema,
     this.onSaved,
     this.onRefreshForm,
-
-    // HACERLOS OPCIONALES CON VALOR POR DEFECTO:
     this.useDropdownButton = false,
     this.useRadioButton = false,
     this.useCheckButton = false,
     this.useGridButton = false,
-
     this.onBuildBody,
   });
 
+  // ---- InterfaceProvider (forward a schema) -----------------------------
+  @override
+  bool getClearSelection() => false;
+
+  @override
+  String? getCurrentActionOwner() => schema.actionOwner;
+
+  @override
+  String? getCurrentActionOwnerFromSelect() => schema.actionOwner;
+
+  @override
+  String? getMultipleActionOwnerList() => '';
+
+  @override
+  String? getMultipleCurrentActionOwnerDest() => null;
+
+  @override
+  String? getSelectedCell() => '';
+
+  @override
+  String? getSelectedRow() => '';
+
+  @override
+  String? getSelection() => '';
+
+  @override
+  String? getSelectionSpecial(String specialselector) => '';
+
+  @override
+  bool hasMoreSelections() => false;
+
+  @override
+  bool hasMultipleSelect() => false;
+
+  @override
+  bool hasMultipleSelectSpecial(String specialselector) => false;
+
+  @override
+  State<JSONSelectField> createState() => _JSONSelectFieldState();
+}
+
+class _JSONSelectFieldState extends State<JSONSelectField> {
+  // ---- LOV RESPONSIVE (win_lov_responsive) ------------------------------
+  late final TextEditingController _lovController;
+  List<AstorItem> _lovResults = <AstorItem>[];
+  bool _isLoadingLov = false;
+
+  bool get _isLovResponsive =>
+      widget.schema.type == 'win_lov_responsive';
+
+  @override
+  void initState() {
+    super.initState();
+    _lovController = TextEditingController(
+      text: widget.schema.choices.isNotEmpty
+          ? widget.schema.choices.first?.descripcion
+          : '',
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant JSONSelectField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // si se actualiza la elección desde afuera, sincronizamos el texto
+    if (widget.schema != oldWidget.schema) {
+      final desc = widget.schema.choices.isNotEmpty
+          ? widget.schema.choices.first?.descripcion
+          : '';
+      _lovController.text = desc!;
+    }
+  }
+
+  @override
+  void dispose() {
+    _lovController.dispose();
+    super.dispose();
+  }
+
+  // ----------------------------------------------------------------------
 
   List<AstorItem> _selectedValues() {
-    return schema.choices.whereType<AstorItem>().toList();
+    return widget.schema.choices.whereType<AstorItem>().toList();
   }
 
   AstorItem? _selectedValue() {
-    return schema.choices.isNotEmpty ? schema.choices.first : null;
+    return widget.schema.choices.isNotEmpty
+        ? widget.schema.choices.first
+        : null;
+  }
+
+  TextStyle _titleStyle(BuildContext context) {
+    return Theme.of(context)
+        .textTheme
+        .titleMedium
+        ?.copyWith(fontSize: 18) ??
+        const TextStyle(fontSize: 18);
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool visible = schema.visible;
-    final bool edited = schema.edited;
+    final bool visible = widget.schema.visible;
+    final bool edited = widget.schema.edited;
+
+    // Modo solo lectura
     if (!edited) {
       return buildReadOnly(visible, context);
     }
 
-    if (useCheckButton) {
+    // Modo especial: win_lov_responsive (editable + búsqueda remota)
+    if (_isLovResponsive) {
+      return buildLovResponsive(visible, context);
+    }
+
+    // Resto de modos existentes
+    if (widget.useCheckButton) {
       return buildMultiCheck(visible, context);
     }
-    if (useRadioButton) {
-      if (schema.orientation == 'toogle') {
+    if (widget.useRadioButton) {
+      if (widget.schema.orientation == 'toogle') {
         return buildRabioButtonToggle(visible, context);
       }
-      if (schema.orientation == 'horizontal') {
+      if (widget.schema.orientation == 'horizontal') {
         return buildRabioButtonHorizontal(visible, context);
       }
       return buildRabioButtonVertical(visible, context);
     }
-    if (useGridButton) {
+    if (widget.useGridButton) {
       return buildGridButton(visible, context);
     }
-    if (useDropdownButton) {
+    if (widget.useDropdownButton) {
       return buildCombo(visible, context);
     }
     return buildWinLov(visible, context);
   }
 
+  // ----------------------------------------------------------------------
+  //  READ ONLY
+  // ----------------------------------------------------------------------
   Widget buildReadOnly(bool visible, BuildContext context) {
     return Visibility(
       visible: visible,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
         child: TextFormField(
-          key: Key('textfield-${schema.name}'),
+          key: Key('textfield-${widget.schema.name}'),
           maxLines: 1,
           enabled: false,
           initialValue: getDescripcion(),
-          decoration: InputDecoration(
-            filled: false,
-            labelText: schema.label,
-          ),
+          decoration: buildAstorInputDecoration(context, widget.schema),
         ),
       ),
     );
   }
 
-  TextStyle _titleStyle(BuildContext context) {
-    // subtitle1 ya no existe en M3 -> usamos titleMedium
-    return Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18) ??
-        const TextStyle(fontSize: 18);
+  // ----------------------------------------------------------------------
+  //  LOV RESPONSIVE (win_lov_responsive)  -> campo editable + lista abajo
+  // ----------------------------------------------------------------------
+  Widget buildLovResponsive(bool visible, BuildContext context) {
+    return Visibility(
+      visible: visible,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _lovController,
+              decoration: buildAstorInputDecoration(context, widget.schema)
+                  .copyWith(labelText: widget.schema.label),
+              onChanged: (text) async {
+                // cada cambio dispara búsqueda remota
+                final provider = Provider.of<AstorProvider>(
+                  context,
+                  listen: false,
+                );
+                setState(() => _isLoadingLov = true);
+
+                final future = provider.winLovOpen(widget.schema, text);
+                final result = await (future ?? Future.value(<AstorItem>[]));
+                if (!mounted) return;
+
+                setState(() {
+                  _lovResults = result ?? <AstorItem>[];
+                  _isLoadingLov = false;
+                });
+              },
+            ),
+            if (_isLoadingLov)
+              const Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: LinearProgressIndicator(minHeight: 2),
+              ),
+            if (_lovResults.isNotEmpty)
+              Card(
+                margin: const EdgeInsets.only(top: 4),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _lovResults.length,
+                  itemBuilder: (context, index) {
+                    final item = _lovResults[index];
+                    return ListTile(
+                      title: Text(item.descripcion),
+                      onTap: () {
+                        setState(() {
+                          _lovController.text = item.descripcion;
+                          widget.schema.value = item.id;
+                          widget.schema.choices = [item];
+                          _lovResults = <AstorItem>[];
+                        });
+
+                        widget.onSaved?.call([item]);
+                        if (widget.schema.refreshForm &&
+                            widget.onRefreshForm != null) {
+                          widget.onRefreshForm!(widget.schema, context);
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
+  // ----------------------------------------------------------------------
+  //  RADIO (vertical / horizontal / toggle)
+  // ----------------------------------------------------------------------
   Widget buildRabioButtonVertical(bool visible, BuildContext context) {
     final AstorItem? selectedValue = _selectedValue();
 
@@ -115,19 +278,15 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                schema.label,
-                style: _titleStyle(context),
-              ),
-              for (final AstorItem choice in schema.items)
+              Text(widget.schema.label, style: _titleStyle(context)),
+              for (final AstorItem choice in widget.schema.items)
                 RadioListTile<AstorItem?>(
                   onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
-                    onSaved?.call([value]);
-                    if (schema.refreshForm) {
-                      onRefreshForm?.call(schema, context);
+                    if (value == null) return;
+                    widget.onSaved?.call([value]);
+                    if (widget.schema.refreshForm &&
+                        widget.onRefreshForm != null) {
+                      widget.onRefreshForm!(widget.schema, context);
                     }
                   },
                   groupValue: selectedValue,
@@ -155,25 +314,21 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                schema.label,
-                style: _titleStyle(context),
-              ),
+              Text(widget.schema.label, style: _titleStyle(context)),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.start,
                 direction: Axis.horizontal,
                 children: [
-                  for (final AstorItem choice in schema.items)
+                  for (final AstorItem choice in widget.schema.items)
                     SizedBox(
                       width: 50,
                       child: RadioListTile<AstorItem?>(
                         onChanged: (value) {
-                          if (value == null) {
-                            return;
-                          }
-                          onSaved?.call([value]);
-                          if (schema.refreshForm) {
-                            onRefreshForm?.call(schema, context);
+                          if (value == null) return;
+                          widget.onSaved?.call([value]);
+                          if (widget.schema.refreshForm &&
+                              widget.onRefreshForm != null) {
+                            widget.onRefreshForm!(widget.schema, context);
                           }
                         },
                         groupValue: selectedValue,
@@ -192,6 +347,12 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
 
   Widget buildRabioButtonToggle(bool visible, BuildContext context) {
     final AstorItem? selectedValue = _selectedValue();
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+    final borderColor =
+        theme.colorScheme.outlineVariant; // borde suave tipo M3
+    const radius = 999.0; // bien redondeado
 
     return Visibility(
       visible: visible,
@@ -199,57 +360,71 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
         child: OutlineButtonContainer(
           isFilled: false,
-          isOutlined: true,
+          isOutlined: false,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (schema.label != '')
-                Text(
-                  schema.label,
-                  style: _titleStyle(context),
+              if (widget.schema.label.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    widget.schema.label,
+                    style: _titleStyle(context),
+                  ),
                 ),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.start,
-                direction: Axis.horizontal,
-                children: [
-                  for (final AstorItem choice in schema.items)
-                    TextButton(
-                      onPressed: () {
-                        onSaved?.call([choice]);
-                        if (schema.refreshForm) {
-                          onRefreshForm?.call(schema, context);
-                        }
-                      },
-                      style: ButtonStyle(
-                        padding: WidgetStateProperty.all<EdgeInsets>(
-                          const EdgeInsets.all(0),
-                        ),
-                        shape:
-                            WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0.0),
-                            side: const BorderSide(color: Colors.blue),
+
+              // Píldora completa
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  border: Border.all(color: borderColor),
+                  color: theme.colorScheme.surface,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    for (final AstorItem choice in widget.schema.items)
+                      Expanded(
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(radius),
+                          onTap: () {
+                            widget.onSaved?.call([choice]);
+                            if (widget.schema.refreshForm &&
+                                widget.onRefreshForm != null) {
+                              widget.onRefreshForm!(widget.schema, context);
+                            }
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(radius),
+                              color: selectedValue == choice
+                                  ? primary
+                                  : Colors.transparent,
+                            ),
+                            child: Center(
+                              child: Text(
+                                choice.descripcion,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: selectedValue == choice
+                                      ? onPrimary
+                                      : primary,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        backgroundColor: WidgetStateProperty.all(
-                          selectedValue == choice
-                              ? Colors.blue
-                              : Colors.white,
-                        ),
-                        foregroundColor: WidgetStateProperty.all(
-                          selectedValue == choice
-                              ? Colors.white
-                              : Colors.blue,
-                        ),
                       ),
-                      child: Text(
-                        choice.descripcion,
-                        style: const TextStyle(fontSize: 10),
-                        overflow: TextOverflow.fade,
-                      ),
-                    ),
-                ],
-              )
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -257,6 +432,10 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
     );
   }
 
+
+  // ----------------------------------------------------------------------
+  //  GRID BUTTON
+  // ----------------------------------------------------------------------
   Widget buildGridButton(bool visible, BuildContext context) {
     final AstorItem? selectedValue = _selectedValue();
     return Visibility(
@@ -265,25 +444,23 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
         child: OutlineButtonContainer(
           isFilled: false,
-          isOutlined: schema.items.isEmpty,
+          isOutlined: widget.schema.items.isEmpty,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                schema.label,
-                style: _titleStyle(context),
-              ),
+              Text(widget.schema.label, style: _titleStyle(context)),
               SizedBox(
                 width: double.maxFinite,
                 child: Wrap(
                   crossAxisAlignment: WrapCrossAlignment.start,
                   children: [
-                    for (final AstorItem choice in schema.items)
+                    for (final AstorItem choice in widget.schema.items)
                       InkWell(
                         onTap: () {
-                          onSaved?.call([choice]);
-                          if (schema.refreshForm) {
-                            onRefreshForm?.call(schema, context);
+                          widget.onSaved?.call([choice]);
+                          if (widget.schema.refreshForm &&
+                              widget.onRefreshForm != null) {
+                            widget.onRefreshForm!(widget.schema, context);
                           }
                         },
                         child: SizedBox(
@@ -311,14 +488,17 @@ class JSONSelectField extends StatelessWidget implements InterfaceProvider {
     );
   }
 
-Widget buildFormAlta(BuildContext context) {
-  return NewPage(
-    schema: schema,
-    onBuildBody: onBuildBody ?? (comp) => const SizedBox.shrink(),
-    title: schema.label,
-  );
-}
-
+  // ----------------------------------------------------------------------
+  //  COMBO DROPDOWN
+  // ----------------------------------------------------------------------
+  Widget buildFormAlta(BuildContext context) {
+    return NewPage(
+      schema: widget.schema,
+      onBuildBody:
+      widget.onBuildBody ?? (comp) => const SizedBox.shrink(),
+      title: widget.schema.label,
+    );
+  }
 
   Widget buildCombo(bool visible, BuildContext context) {
     final AstorItem? selectedValue = _selectedValue();
@@ -328,9 +508,7 @@ Widget buildFormAlta(BuildContext context) {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
         child: GestureDetector(
           onLongPress: () {
-            if (schema.components.isEmpty) {
-              return;
-            }
+            if (widget.schema.components.isEmpty) return;
             showDialog(
               context: context,
               builder: (context) => buildFormAlta(context),
@@ -345,26 +523,25 @@ Widget buildFormAlta(BuildContext context) {
                   flex: 9,
                   child: DropdownButton<AstorItem>(
                     key: const Key('Dropdown'),
-                    hint: Text(schema.label),
+                    hint: Text(widget.schema.label),
                     isExpanded: true,
                     onChanged: (value) {
-                      if (value == null) {
-                        return;
-                      }
-                      onSaved?.call([value]);
-                      if (schema.refreshForm) {
-                        onRefreshForm?.call(schema, context);
+                      if (value == null) return;
+                      widget.onSaved?.call([value]);
+                      if (widget.schema.refreshForm &&
+                          widget.onRefreshForm != null) {
+                        widget.onRefreshForm!(widget.schema, context);
                       }
                     },
                     value: selectedValue,
-                    items: schema.items
+                    items: widget.schema.items
                         .map(
                           (e) => DropdownMenuItem<AstorItem>(
-                            key: Key('Dropdown-${e.id}'),
-                            value: e,
-                            child: Text(e.descripcion),
-                          ),
-                        )
+                        key: Key('Dropdown-${e.id}'),
+                        value: e,
+                        child: Text(e.descripcion),
+                      ),
+                    )
                         .toList(),
                   ),
                 ),
@@ -376,6 +553,9 @@ Widget buildFormAlta(BuildContext context) {
     );
   }
 
+  // ----------------------------------------------------------------------
+  //  MULTI CHECK
+  // ----------------------------------------------------------------------
   Widget buildMultiCheck(bool visible, BuildContext context) {
     final List<AstorItem> selectValues = _selectedValues();
     return Visibility(
@@ -384,20 +564,17 @@ Widget buildFormAlta(BuildContext context) {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
         child: OutlineButtonContainer(
           isFilled: false,
-          isOutlined: schema.items.isEmpty,
+          isOutlined: widget.schema.items.isEmpty,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                schema.label,
-                style: _titleStyle(context),
-              ),
+              Text(widget.schema.label, style: _titleStyle(context)),
               SizedBox(
                 width: double.maxFinite,
                 child: Wrap(
                   crossAxisAlignment: WrapCrossAlignment.start,
                   children: [
-                    for (final AstorItem choice in schema.items)
+                    for (final AstorItem choice in widget.schema.items)
                       SizedBox(
                         width: 200,
                         child: OutlineButtonContainer(
@@ -415,11 +592,12 @@ Widget buildFormAlta(BuildContext context) {
                                 selectValues.remove(choice);
                               }
 
-                              onSaved?.call(
-                                List<AstorItem>.from(selectValues),
-                              );
-                              if (schema.refreshForm) {
-                                onRefreshForm?.call(schema, context);
+                              widget.onSaved
+                                  ?.call(List<AstorItem>.from(selectValues));
+                              if (widget.schema.refreshForm &&
+                                  widget.onRefreshForm != null) {
+                                widget.onRefreshForm!(
+                                    widget.schema, context);
                               }
                             },
                             activeTrackColor: Colors.lightBlueAccent,
@@ -439,6 +617,9 @@ Widget buildFormAlta(BuildContext context) {
     );
   }
 
+  // ----------------------------------------------------------------------
+  //  WIN LOV CLÁSICO (dialog SelectionPage)
+  // ----------------------------------------------------------------------
   Widget buildWinLov(bool visible, BuildContext context) {
     return Visibility(
       visible: visible,
@@ -446,9 +627,7 @@ Widget buildFormAlta(BuildContext context) {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
         child: GestureDetector(
           onLongPress: () {
-            if (schema.components.isEmpty) {
-              return;
-            }
+            if (widget.schema.components.isEmpty) return;
             showDialog(
               context: context,
               builder: (context) => buildFormAlta(context),
@@ -459,27 +638,28 @@ Widget buildFormAlta(BuildContext context) {
             isOutlined: true,
             child: ListTile(
               key: const Key('selection-field'),
-              leading: schema.icon != null
+              leading: widget.schema.icon != null
                   ? Icon(
-                      schema.icon!.iconData,
-                      color: Theme.of(context).iconTheme.color,
-                    )
+                widget.schema.icon!.iconData,
+                color: Theme.of(context).iconTheme.color,
+              )
                   : null,
               trailing: Icon(
                 Icons.expand_more,
                 color: Theme.of(context).iconTheme.color,
               ),
-              onTap: schema.items.isEmpty
+              onTap: widget.schema.items.isEmpty
                   ? null
                   : () {
-                      FocusScope.of(context)
-                          .requestFocus(FocusNode());
-                      showDialog(
-                        context: context,
-                        builder: (context) => buildSelectionPage(context),
-                      );
-                    },
-              title: Text(schema.label),
+                FocusScope.of(context)
+                    .requestFocus(FocusNode());
+                showDialog(
+                  context: context,
+                  builder: (context) =>
+                      buildSelectionPage(context),
+                );
+              },
+              title: Text(widget.schema.label),
               subtitle: Text(getDescripcion()),
             ),
           ),
@@ -499,97 +679,28 @@ Widget buildFormAlta(BuildContext context) {
 
   SelectionPage buildSelectionPage(BuildContext context) {
     final AstorProvider provider =
-        Provider.of<AstorProvider>(context, listen: false);
+    Provider.of<AstorProvider>(context, listen: false);
 
-    // winLovOpen: Future<List<AstorItem>?>? Function(AstorCombo, String)
-    // lo adaptamos al typedef OnSearch esperado por SelectionPage
     return SelectionPage(
-  schema: schema,
-  onSearch: (combo, text) async {
-    final future = provider.winLovOpen(combo, text);
-
-    // future puede ser null -> devolvemos lista vacía
-    if (future == null) {
-      return <AstorItem>[];
-    }
-
-    final result = await future;
-
-    // result puede ser null -> también devolvemos lista vacía
-    return result ?? <AstorItem>[];
-  },
-  multiple: schema.multiple,
-  useDialog: true,
-  onSelected: (value) {
-    onSaved?.call(value);
-    if (schema.refreshForm) {
-      onRefreshForm?.call(schema, context);
-    }
-  },
-  title: schema.label,
-  selections: schema.items,
-  value: _selectedValues(),
-);
-
-  }
-
-  @override
-  bool getClearSelection() {
-    return false;
-  }
-
-  @override
-  String? getCurrentActionOwner() {
-    return schema.actionOwner;
-  }
-
-  @override
-  String? getCurrentActionOwnerFromSelect() {
-    return schema.actionOwner;
-  }
-
-  @override
-  String? getMultipleActionOwnerList() {
-    return '';
-  }
-
-  @override
-  String? getMultipleCurrentActionOwnerDest() {
-    return null;
-  }
-
-  @override
-  String? getSelectedCell() {
-    return '';
-  }
-
-  @override
-  String? getSelectedRow() {
-    return '';
-  }
-
-  @override
-  String? getSelection() {
-    return '';
-  }
-
-  @override
-  String? getSelectionSpecial(String specialselector) {
-    return '';
-  }
-
-  @override
-  bool hasMoreSelections() {
-    return false;
-  }
-
-  @override
-  bool hasMultipleSelect() {
-    return false;
-  }
-
-  @override
-  bool hasMultipleSelectSpecial(String specialselector) {
-    return false;
+      schema: widget.schema,
+      onSearch: (combo, text) async {
+        final future = provider.winLovOpen(combo, text);
+        if (future == null) return <AstorItem>[];
+        final result = await future;
+        return result ?? <AstorItem>[];
+      },
+      multiple: widget.schema.multiple,
+      useDialog: true,
+      onSelected: (value) {
+        widget.onSaved?.call(value);
+        if (widget.schema.refreshForm &&
+            widget.onRefreshForm != null) {
+          widget.onRefreshForm!(widget.schema, context);
+        }
+      },
+      title: widget.schema.label,
+      selections: widget.schema.items,
+      value: _selectedValues(),
+    );
   }
 }

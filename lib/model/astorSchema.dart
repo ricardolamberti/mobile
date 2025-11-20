@@ -999,6 +999,29 @@ class AstorComponente {
   };
 
 
+  /// Busca el primer componente (este o algún descendiente) que cumpla [test]
+  AstorComponente? findFirst(bool Function(AstorComponente c) test) {
+    if (test(this)) return this;
+    for (final child in components) {
+      final found = child.findFirst(test);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  /// Devuelve true si este componente o algún descendiente cumple [test]
+  bool anyDescendant(bool Function(AstorComponente c) test) {
+    return findFirst(test) != null;
+  }
+
+  bool hasCssClass(String cls) {
+    final classes = classResponsive.trim();
+    if (classes.isEmpty) return false;
+    return classes
+        .split(RegExp(r'\s+'))
+        .any((c) => c.trim() == cls);
+  }
+
   bool isVisibleInContext(context) {
     if (forceVisible!=null) {
       return forceVisible!;
@@ -1103,31 +1126,20 @@ class AstorComponente {
   String get classResponsive =>  attributes['class_responsive']==null?'':attributes['class_responsive']!;
   String get classTableResponsive =>  attributes['class_table_responsive']==null?'':attributes['class_table_responsive']!;
   String get fullClassResponsive =>  attributes['size_responsive']==null?classResponsive:sizeResponsive;
-  bool get isFilterForm {
-    if (type != 'form_responsive') {
-      return false;
+    bool get isFilterForm {
+      if (type != 'form_responsive') {
+        return false;
+      }
+      final classes = classResponsive.trim();
+      if (classes.isEmpty) {
+        return false;
+      }
+      return classes
+          .split(RegExp(r'\s+'))
+          .any((cls) => cls.trim() == 'form-filter');
     }
-    final classes = classResponsive.trim();
-    if (classes.isEmpty) {
-      return false;
-    }
-    return classes
-        .split(RegExp(r'\s+'))
-        .any((cls) => cls.trim() == 'form-filter');
-  }
 
-  bool hasCssClass(String cls) {
-    if (cls.isEmpty) {
-      return false;
-    }
-    final classes = classResponsive.trim();
-    if (classes.isEmpty) {
-      return false;
-    }
-    return classes
-        .split(RegExp(r'\s+'))
-        .any((c) => c.trim() == cls);
-  }
+
   bool get hasMoreSelection =>  attributes['has_more_selection']==null?false:attributes['has_more_selection']=="true";
   String get ajaxContainer =>  attributes['action_ajax_container']==null?'':attributes['action_ajax_container']!;
   bool get refreshForm =>  attributes['refreshForm']==null?false:attributes['refreshForm']=="true";
@@ -1740,8 +1752,6 @@ class AstorApp {
     }
     return listOfFields;
   }
-
-
 
 
 

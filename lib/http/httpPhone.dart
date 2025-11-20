@@ -215,8 +215,8 @@ class AstorWebHttpPhone extends AstorWebHttp {
     final bodyStr = const Utf8Decoder().convert(response.bodyBytes);
 
     // 🔍 log completo, sin truncar
-    logLong('RAW RESPONSE ${response.request?.url}', bodyStr);
-    saveLastResponseToFile(bodyStr);
+    //logLong('RAW RESPONSE ${response.request?.url}', bodyStr);
+   // saveLastResponseToFile(bodyStr);
 
     final trimmed = bodyStr.trimLeft();
 
@@ -233,12 +233,12 @@ class AstorWebHttpPhone extends AstorWebHttp {
 
       // Opcional: pretty-print del JSON, también chunked
       final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
-      logLong('JSON DECODED ${response.request?.url}', pretty);
+     // logLong('JSON DECODED ${response.request?.url}', pretty);
 
       return decoded;
     } catch (e) {
       // Si falla, logueo de nuevo lo que intenté parsear
-      logLong('JSON PARSE ERROR BODY', trimmed);
+    //  logLong('JSON PARSE ERROR BODY', trimmed);
       throw Exception('Error al parsear JSON: $e');
     }
   }

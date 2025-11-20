@@ -1,7 +1,7 @@
 name: astor_mobile
 description: "TKM 8"
 publish_to: 'none'
-version: 8.0.1+9
+version: 8.0.1+10
 
 environment:
   sdk: ^3.10.0
